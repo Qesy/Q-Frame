@@ -23,8 +23,7 @@ abstract class Db {
 			'Index' => '',
 			'Limit' => '',
 			'Sort' => array (),
-			'IsDebug' => 0,
-			'Count' => 0 
+			'IsDebug' => 0 
 	);
 	
 	/*
@@ -203,8 +202,7 @@ abstract class Db {
 				'Index' => '',
 				'Limit' => '',
 				'Sort' => array (),
-				'IsDebug' => 0,
-				'Count' => 0 
+				'IsDebug' => 0 
 		);
 	}
 }

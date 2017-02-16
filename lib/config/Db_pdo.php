@@ -45,15 +45,11 @@ class Db_pdo extends Db {
 		$this->sqlSetArr ['IsDebug'] = $IsDebug;
 		return $this;
 	}
-	public function SetCount($Count) {
-		$this->sqlSetArr ['Count'] = $Count;
-		return $this;
-	}
 	public function ExecSelectOne() {
 		return self::selectOne ( $this->sqlSetArr ['Cond'], $this->sqlSetArr ['Field'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['Index'], $this->sqlSetArr ['Limit'], $this->sqlSetArr ['Sort'], 1, $this->sqlSetArr ['IsDebug'] );
 	}
-	public function ExecSelectAll() {
-		return self::selectAll ( $this->sqlSetArr ['Cond'], $this->sqlSetArr ['Field'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['Index'], $this->sqlSetArr ['Limit'], $this->sqlSetArr ['Sort'], $this->sqlSetArr ['IsDebug'], $this->sqlSetArr ['Count'] );
+	public function ExecSelectAll(&$count = 0) {
+		return self::selectAll ( $this->sqlSetArr ['Cond'], $this->sqlSetArr ['Field'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['Index'], $this->sqlSetArr ['Limit'], $this->sqlSetArr ['Sort'], $this->sqlSetArr ['IsDebug'], $count );
 	}
 	public function ExecSelect() {
 		return self::selectOne ( $this->sqlSetArr ['Cond'], $this->sqlSetArr ['Field'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['Index'], $this->sqlSetArr ['Limit'], $this->sqlSetArr ['Sort'], 0, $this->sqlSetArr ['IsDebug'] );
@@ -70,8 +66,8 @@ class Db_pdo extends Db {
 	public function ExecDelete() {
 		return self::delete ( $this->sqlSetArr ['Cond'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['IsDebug'] );
 	}
-	public function selectOne($cond_arr = array(), $field = '*', $tb_name = 0, $index = 0, $limit = '', $sort = '', $fetch = 0) {
-		return self::select ( $cond_arr, $field, $tb_name, $index, $limit, $sort, 1 );
+	public function selectOne($cond_arr = array(), $field = '*', $tb_name = 0, $index = 0, $limit = '', $sort = '', $fetch = 0, $isDebug = 0) {
+		return self::select ( $cond_arr, $field, $tb_name, $index, $limit, $sort, 1, $isDebug );
 	}
 	public function select($cond_arr = array(), $field = '*', $tb_name = 0, $index = 0, $limit = '', $sort = '', $fetch = 0, $isDebug = 0) {
 		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
@@ -89,9 +85,9 @@ class Db_pdo extends Db {
 		}
 	}
 	public function selectAll($cond_arr = '', $field = '*', $tb_name = 0, $index = 0, $limit = '', $sort = '', $isDebug = 0, &$count) {
-		$countRs = $this->exec_selectOne ( $cond_arr, 'COUNT(*) AS count', $tb_name, 0, '', '', 0 );
+		$countRs = self::selectOne ( $cond_arr, 'COUNT(*) AS count', $tb_name, 0, '', '', 0, $isDebug );
 		$count = $countRs ['count'];
-		return $this->exec_select ( $cond_arr, $field, $tb_name, $index, $limit, $sort, 0 );
+		return self::select ( $cond_arr, $field, $tb_name, $index, $limit, $sort, 0, $isDebug );
 	}
 	public function insert($insert_arr = array(), $tb_name = 0, $isDebug = 0) {
 		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
