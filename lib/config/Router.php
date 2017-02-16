@@ -27,8 +27,11 @@ class Router {
 	}
 	private function _fetch_url() {
 		$controller_arr = array ();
-		$requestUrl = (php_sapi_name () == 'cli') ? '/' . implode ( '/', array_slice ( $_SERVER ['argv'], 1 ) ) : $_SERVER ['REDIRECT_URL'];
-		$uri = ! strpos ( $requestUrl, $this->_default ['Extend'] ) ? substr ( $requestUrl, strlen ( SITE_PATH ) ) : substr ( $requestUrl, strlen ( SITE_PATH ), - strlen ( $this->_default ['Extend'] ) );
+		if (php_sapi_name () == 'cli') {
+			$uri = implode ( '/', array_slice ( $_SERVER ['argv'], 1 ) );
+		} else {
+			$uri = ! strpos ( $_SERVER ['REDIRECT_URL'], $this->_default ['Extend'] ) ? substr ( $_SERVER ['REDIRECT_URL'], strlen ( SITE_PATH ) ) : substr ( $_SERVER ['REDIRECT_URL'], strlen ( SITE_PATH ), - strlen ( $this->_default ['Extend'] ) );
+		}
 		if (! $uri) {
 			$controller_arr ['name'] = $this->_default ['DefaultController'];
 			$controller_arr ['url'] = SYS_PATH . 'controller/' . $this->_default ['DefaultController'] . EXTEND;
@@ -38,7 +41,7 @@ class Router {
 			$url = '';
 			foreach ( $uri_arr as $key => $val ) {
 				$file = $url . $val;
-				$url .= $val . '/';
+				$url .= $val . $this->_default ['Url'];
 				if (file_exists ( SYS_PATH . 'controller/' . $file . EXTEND )) {
 					$controller_arr ['name'] = $val;
 					$controller_arr ['url'] = SYS_PATH . 'controller/' . $file . EXTEND;
@@ -60,6 +63,15 @@ class Router {
 	private function view_controller() {
 		$controller_arr = self::_fetch_url ();
 		require $controller_arr ['url'];
+		if (! method_exists ( $controller_arr ['name'], $controller_arr ['method'] . '_Action' )) {
+			$controller_arr = array (
+					'name' => 'home',
+					'url' => SYS_PATH . 'controller/home.php',
+					'method' => 'err',
+					'fun_arr' => array () 
+			);
+			require $controller_arr ['url'];
+		}
 		self::$s_controller = $controller_arr ['name'];
 		self::$s_method = $controller_arr ['method'];
 		Base::insert_func_array ( $controller_arr );

@@ -89,22 +89,10 @@ abstract class Base {
 	public static function insert_func_array(array $controllerArr) {
 		$fun_arr = isset ( $controllerArr ['funArr'] ) ? $controllerArr ['funArr'] : array ();
 		$clss = new $controllerArr ['name'] ();
-		exit ();
 		call_user_func_array ( array (
 				& $clss,
 				$controllerArr ['method'] . '_Action' 
 		), $fun_arr );
-	}
-	function __autoload($class_name, $type = 'helper/', $dbname = 0) {
-		exit ();
-		if (file_exists ( LIB_PATH . $type . $class_name . EXT )) {
-			require_once LIB_PATH . $type . $class_name . EXT;
-			$objects_m [$class_name] = ($type == 'Model/') ? $class_name::get_instance ( $dbname ) : new $class_name (); // new $class_name();//
-			                                                                                                             // $objects_m[$class_name] = ($type == 'Model/') ? new $class_name($dbname) : new $class_name();//new $class_name();
-			return $objects_m [$class_name];
-		} else {
-			return FALSE;
-		}
 	}
 	public function s_send($address, $name, $title, $content, $replace_arr = array(), $type = 'default') {
 		$temp = file_get_contents ( 'static/mail/' . $type . '.html' );

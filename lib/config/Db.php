@@ -13,19 +13,21 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
 abstract class Db {
 	protected static $p_db_obj;
 	protected $p_dbName;
+	protected $p_dbConfig;
 	
 	/*
 	 * Name : 构造函数
 	 */
 	public function __construct($dbname = 0) {
 		$this->p_dbName = $dbname;
+		$this->p_dbConfig = db_config ( $this->p_dbName );
 		self::_get_db_config ();
 	}
 	/*
 	 * Name : 析构函数
 	 */
 	public function __destruct() {
-		$this->p_db_obj = null;
+		self::$p_db_obj = null;
 	}
 	/*
 	 * Name : 获取配置
@@ -34,16 +36,15 @@ abstract class Db {
 		if (isset ( self::$p_db_obj [$this->p_dbName] )) {
 			return self::$p_db_obj [$this->p_dbName];
 		}
-		$dbConfig = db_config ( $this->p_dbName );
 		try {
-			self::$p_db_obj [$this->p_dbName] = new PDO ( 'mysql : dbname=' . $dbConfig ['Name'] . ';host=' . $dbConfig ['Host'] . '', $dbConfig ['Accounts'], $dbConfig ['Password'], array (
+			self::$p_db_obj [$this->p_dbName] = new PDO ( 'mysql:dbname=' . $this->p_dbConfig ['Name'] . ';host=' . $this->p_dbConfig ['Host'] . '', $this->p_dbConfig ['Accounts'], $this->p_dbConfig ['Password'], array (
 					PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
 			) );
 		} catch ( PDOException $e ) {
 			echo 'Connection failed: ' . $e->getMessage ();
 			exit ();
 		}
-		self::$p_db_obj [$this->p_dbName]->exec ( "SET NAMES " . $dbConfig ['Charset'] );
+		self::$p_db_obj [$this->p_dbName]->exec ( "SET NAMES " . $this->p_dbConfig ['Charset'] );
 	}
 	
 	/*
@@ -96,9 +97,6 @@ abstract class Db {
 	 * Name : 条件帮助
 	 */
 	public function get_sql_cond($cond_arr = '') {
-		if (empty ( $cond_arr )) {
-			return '';
-		}
 		if (! is_array ( $cond_arr )) {
 			return $cond_arr;
 		}

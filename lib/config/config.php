@@ -16,14 +16,23 @@ function db_config($key) {
 			array (
 					'Host' => '127.0.0.1',
 					'Accounts' => 'root',
-					'Password' => '1234!@#$',
-					'Name' => 'jz',
+					'Password' => 'root',
+					'Name' => 'soccer_girl',
 					'Port' => '3306',
-					'Prefix' => 'jz_',
+					'Prefix' => 'sg_',
+					'Charset' => 'utf8' 
+			),
+			array (
+					'Host' => '127.0.0.1',
+					'Accounts' => 'root',
+					'Password' => 'root',
+					'Name' => 'gotest',
+					'Port' => '3306',
+					'Prefix' => 'go_',
 					'Charset' => 'utf8' 
 			) 
 	);
-	! isset ( $dbConfArr [$key] ) || die ( 'No Db Config .' );
+	isset ( $dbConfArr [$key] ) || die ( 'No Db Config .' );
 	return $dbConfArr [$key];
 }
 function site_config() {

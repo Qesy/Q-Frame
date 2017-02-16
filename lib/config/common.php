@@ -59,9 +59,9 @@ function utf8Substr($str, $from, $len) { // -- 切utf8字符串 --
 function __autoload($classname) { // -- 自动加载类 --
 	$filename = LIB_PATH . 'Model/' . $classname . '.php';
 	if (file_exists ( $filename ))
-		require_once $filename;
+		require $filename;
 	$filename = LIB_PATH . 'helper/' . $classname . '.php';
 	if (file_exists ( $filename ))
-		require_once $filename;
+		require $filename;
 }
 ?>
