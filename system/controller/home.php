@@ -5,8 +5,7 @@ class Home extends Controllers {
 		header ( "HTTP/1.1 404 Not Found" );
 		echo '404 error !';
 	}
-	public function err() {
-		header ( "HTTP/1.1 404 Not Found" );
-		echo '404 error !!';
+	public function phpinfo_Action() {
+		phpinfo ();
 	}
 }

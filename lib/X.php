@@ -18,8 +18,8 @@ require LIB_PATH . 'config/Db' . EXTEND;
 require LIB_PATH . 'config/Db_pdo' . EXTEND;
 require LIB_PATH . 'config/config' . EXTEND;
 require LIB_PATH . 'config/Router' . EXTEND;
-// require LIB_PATH . 'helper/PHPMailer' . EXTEND;
 session_set_cookie_params ( 24 * 3600 );
 session_start ();
+! version_compare ( "5.4", PHP_VERSION, ">" ) || die ( "PHP 5.4 or greater is required!!!" );
 Router::get_instance ();
 ?>
