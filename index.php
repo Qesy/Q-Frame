@@ -14,7 +14,6 @@ define ( 'DIRNAME', pathinfo ( __FILE__, PATHINFO_DIRNAME ) );
 define ( 'SYS_PATH', DIRNAME . '/system/' );
 define ( 'LIB_PATH', DIRNAME . '/lib/' );
 define ( 'STATIC_PATH', DIRNAME . '/static/' );
-
 define ( 'SITE_PATH', substr ( $_SERVER ['SCRIPT_NAME'], 0, - 9 ) );
 define ( 'SITE_URL', $_SERVER ['REDIRECT_URL'] );
 define ( 'EXTEND', '.php' );
