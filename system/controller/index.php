@@ -7,9 +7,17 @@ class Index extends Controllers {
 	public function index_Action() {
 		$sgUserObj = SG_User::get_instance ();
 		$goUserObj = GO_User::get_instance ( 1 );
-		$a = $sgUserObj->exec_selectOne ();
-		$b = $goUserObj->exec_selectOne ();
-		$c = $sgUserObj->exec_selectOne ();
-		var_dump ( $a, $b, $c );
+		/*
+		 * $a = $sgUserObj->selectOne ();
+		 * $b = $goUserObj->selectOne ();
+		 * $c = $sgUserObj->selectOne ();
+		 * $d = $goUserObj->selectOne ();
+		 */
+		
+		$a = $sgUserObj->ExecSelectOne ();
+		$b = $goUserObj->ExecSelectOne ();
+		$c = $sgUserObj->ExecSelectOne ();
+		$d = $goUserObj->ExecSelectOne ();
+		var_dump ( $a, $b, $c, $d );
 	}
 }

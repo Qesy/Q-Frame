@@ -14,6 +14,18 @@ abstract class Db {
 	protected static $p_db_obj;
 	protected $p_dbName;
 	protected $p_dbConfig;
+	public $sqlSetArr = array (
+			'Cond' => array (),
+			'Insert' => array (),
+			'Update' => array (),
+			'Field' => '*',
+			'TbName' => 0,
+			'Index' => '',
+			'Limit' => '',
+			'Sort' => array (),
+			'IsDebug' => 0,
+			'Count' => 0 
+	);
 	
 	/*
 	 * Name : 构造函数
@@ -50,7 +62,8 @@ abstract class Db {
 	/*
 	 * Name : 查询
 	 */
-	public function q_select($sql, $fetch_mode = 0) {
+	public function query($sql, $fetch_mode = 0) {
+		self::_clean ();
 		$result = self::$p_db_obj [$this->p_dbName]->query ( $sql );
 		if ($result) {
 			if (empty ( $fetch_mode )) {
@@ -72,7 +85,8 @@ abstract class Db {
 	/*
 	 * Name : 执行
 	 */
-	public function q_exec($sql) {
+	public function exec($sql) {
+		self::_clean ();
 		return self::$p_db_obj [$this->p_dbName]->exec ( $sql );
 	}
 	/*
@@ -178,6 +192,20 @@ abstract class Db {
 		} else {
 			return $sort;
 		}
+	}
+	private function _clean() {
+		$this->sqlSetArr = array (
+				'Cond' => array (),
+				'Insert' => array (),
+				'Update' => array (),
+				'Field' => '*',
+				'TbName' => 0,
+				'Index' => '',
+				'Limit' => '',
+				'Sort' => array (),
+				'IsDebug' => 0,
+				'Count' => 0 
+		);
 	}
 }
 ?>
