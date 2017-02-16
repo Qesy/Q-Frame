@@ -1,34 +1,43 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-/*
- * Name   : Collection
- * Date	  : 20120107 
- * Author : Qesy 
- * QQ	  : 762264
- * Mail   : 762264@qq.com
- *
- *(̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے 
- *
-*/ 
-function db_config($key = null){
-    $dbConfArr = array(
-			'testq' => array(
-				'host' => '127.0.0.1',
-				'username' => 'root',
-				'password' => '1234!@#$',
-				'db_name' => 'jz',
-				'db_driver' => 'mysql',
-				'db_port' => '3306',
-				'db_prefix' => 'jz_',
-				'charset' => 'utf8')
-	);
-    return !isset($dbConfArr[$key]) ? false : $dbConfArr[$key];
-}
+<?php
+defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
 
-function site_config(){
-	return array('suffix' => '.html', 'default_controller' => 'index', 'default_function' => 'index', 'language' => 'en', 'url' => '/');
+/*
+ * Name : Collection
+ * Date : 20120107
+ * Author : Qesy
+ * QQ : 762264
+ * Mail : 762264@qq.com
+ *
+ * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
+ *
+ */
+function db_config($key) {
+	$dbConfArr = array (
+			array (
+					'Host' => '127.0.0.1',
+					'Accounts' => 'root',
+					'Password' => '1234!@#$',
+					'Name' => 'jz',
+					'Port' => '3306',
+					'Prefix' => 'jz_',
+					'Charset' => 'utf8' 
+			) 
+	);
+	! isset ( $dbConfArr [$key] ) || die ( 'No Db Config .' );
+	return $dbConfArr [$key];
 }
-define('WEB_DOMAIN', 'www.qframework.com');
-define('WEB_TITLE', 'Qesy Framework');
-define('WEB_PREFIX', 'QCMS'); //-- 网站前缀，一般用户订单，可以显示给用户看的 --
-define('WEB_KEY', '1234!@#$'); //-- 网站密钥，一般用于加密，不能想让用户知道 --
+function site_config() {
+	return array (
+			'Extend' => '.html',
+			'DefaultController' => 'index',
+			'DefaultFunction' => 'index',
+			'Language' => 'en',
+			'Url' => '/' 
+	);
+}
+const WEB_DOMAIN = 'www.qframework.com';
+const WEB_TITLE = 'Qesy Framework';
+const WEB_PREFIX = 'QFrame';
+const WEB_KEY = '1234!@#$';
+const VERSION = '1.0.0';
 ?>
