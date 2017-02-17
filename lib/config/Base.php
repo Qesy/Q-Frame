@@ -15,19 +15,12 @@ abstract class Base {
 	public $temp_arr = array ();
 	public $cookieObj;
 	function __construct() {
-		$this->cookieObj = cookie::get_instance ();
+		// $this->cookieObj = cookie::get_instance ();
 	}
-	
-	/*
-	 * Name : 生成编号
-	 */
-	public function createSn() {
+	public function createSn() { // -- Name : 生成编号 --
 		return WEB_PREFIX . '-' . uniqid ( rand ( 100, 999 ), false );
 	}
-	/*
-	 * Name : 加载模版
-	 */
-	public function loadView($temp, $data = array()) {
+	public function loadView($temp, $data = array()) { // -- Name : 加载模版 --
 		if (! is_file ( SYS_PATH . 'view/' . $temp . EXTEND ))
 			die ( SYS_PATH . 'view/' . $temp . EXTEND . ' not found !' );
 		$this->temp_arr = empty ( $data ) ? $this->temp_arr : $data;
@@ -36,25 +29,19 @@ abstract class Base {
 		}
 		require SYS_PATH . 'view/' . $temp . EXTEND;
 	}
-	/*
-	 * Name : 加载CSS
-	 */
-	public function loadCss(array $cssArr) {
+	public function loadCss(array $cssArr) { // -- Name : 加载CSS --
 		foreach ( $cssArr as $key => $val ) {
 			echo '<link href="' . CSS_PATH . $val . '.css?v=' . VERSION . '" rel="stylesheet" type="text/css" />';
 		}
 	}
-	/*
-	 * Name : 加载JS
-	 */
-	public function loadScripts(array $jsArr) {
+	public function loadScripts(array $jsArr) { // -- Name : 加载JS --
 		foreach ( $jsArr as $key => $val ) {
 			echo '<script type="text/javascript" src="' . JS_PATH . $val . '.js?v=' . VERSION . '" charset="utf-8"></script>';
 		}
 	}
-	
-	// -- 分页 --
-	public function page_bar($count, $size, $url = '', $num = 9, $pageNum = 1) {
+	public function LoadModel() {
+	}
+	public function page_bar($count, $size, $url = '', $num = 9, $pageNum = 1) { // -- 分页 --
 		if ($count <= 0) {
 			return;
 		}
@@ -82,11 +69,7 @@ abstract class Base {
 		}
 		return '<ul class="pagination">' . $pre . $str . $next . $toallStr . '</ul>';
 	}
-	
-	/*
-	 * Name : 回调函数
-	 */
-	public static function insert_func_array(array $controllerArr) {
+	public static function insert_func_array(array $controllerArr) { // -- Name : 回调函数 --
 		$fun_arr = isset ( $controllerArr ['funArr'] ) ? $controllerArr ['funArr'] : array ();
 		$clss = new $controllerArr ['name'] ();
 		call_user_func_array ( array (

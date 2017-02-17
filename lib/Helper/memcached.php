@@ -13,27 +13,27 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-class cookie {
+class memcached {
+	private $_memcacheObj;
 	private static $s_instance;
-	public $expire = 72; // -- hour --
+	public $memcahceTime = 3600;
 	public static function get_instance() {
 		if (! isset ( self::$s_instance )) {
 			self::$s_instance = new self ();
 		}
 		return self::$s_instance;
 	}
-	public function set($arr, $hour = 0) {
-		$time = empty ( $hour ) ? $this->expire * 60 * 60 : $hour * 60 * 60;
-		foreach ( $arr as $k => $v ) {
-			setcookie ( $k, $v, time () + $time, '/', '' );
-		}
+	public function connection() {
+		$this->_memcacheObj = new Memcache ();
+		$this->_memcacheObj->connect ( '192.168.16.63', 11211 ) or die ( "Could not connect" );
+	}
+	public function set($k, $v) {
+		return $this->_memcacheObj->set ( $k, $v, 0, $this->memcahceTime );
 	}
 	public function get($k) {
-		return empty ( $_COOKIE [$k] ) ? 0 : $_COOKIE [$k];
+		return $this->_memcacheObj->get ( $k );
 	}
-	public function del($arr) {
-		foreach ( $arr as $k => $v ) {
-			setcookie ( $k, '', time () - ($this->expire * 60 * 60), '/', '' );
-		}
+	public function del($k) {
+		return $this->_memcacheObj->delete ( $k, 0 );
 	}
 }

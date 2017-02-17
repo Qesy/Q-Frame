@@ -1,4 +1,7 @@
 <?php
+
+namespace Model;
+
 defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
 /*
  * Name : Collection
@@ -10,7 +13,7 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-class GO_User extends Db_pdo {
+class GO_User extends \Db_pdo {
 	protected $p_table_name = array (
 			'user' 
 	);

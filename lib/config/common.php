@@ -57,10 +57,7 @@ function utf8Substr($str, $from, $len) { // -- 切utf8字符串 --
 	return preg_replace ( '#^(?:[\x00-\x7F]|[\xC0-\xFF][\x80-\xBF]+){0,' . $from . '}' . '((?:[\x00-\x7F]|[\xC0-\xFF][\x80-\xBF]+){0,' . $len . '}).*#s', '$1', $str );
 }
 function __autoload($classname) { // -- 自动加载类 --
-	$filename = LIB_PATH . 'Model/' . $classname . '.php';
-	if (file_exists ( $filename ))
-		require $filename;
-	$filename = LIB_PATH . 'helper/' . $classname . '.php';
+	$filename = LIB_PATH . $classname . '.php';
 	if (file_exists ( $filename ))
 		require $filename;
 }

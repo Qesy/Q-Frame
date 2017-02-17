@@ -32,6 +32,15 @@ class Router {
 		} else {
 			$uri = ! strpos ( $_SERVER ['REDIRECT_URL'], $this->_default ['Extend'] ) ? substr ( $_SERVER ['REDIRECT_URL'], strlen ( SITE_PATH ) ) : substr ( $_SERVER ['REDIRECT_URL'], strlen ( SITE_PATH ), - strlen ( $this->_default ['Extend'] ) );
 		}
+		if (strpos ( $uri, 'poweredByQesy' ) !== false) {
+			echo "powered By Qesy <br>\n";
+			echo "Email : 762264@qq.com <br>\n";
+			echo "Version : QFrame v 1.0.0 <br>\n";
+			echo "Your Ip : " . ip () . "<br>\n";
+			echo "Date : " . date ( 'Y-m-d H:i:s' ) . "<br>\n";
+			echo "UserAgent : " . $_SERVER ['HTTP_USER_AGENT'] . "<br>\n";
+			exit ();
+		}
 		if (! $uri) {
 			$controller_arr ['name'] = $this->_default ['DefaultController'];
 			$controller_arr ['url'] = SYS_PATH . 'controller/' . $this->_default ['DefaultController'] . EXTEND;
