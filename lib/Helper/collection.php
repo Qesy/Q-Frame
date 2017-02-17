@@ -1,6 +1,6 @@
 <?php
 
-namespace Help;
+namespace Helper;
 
 defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
 /*

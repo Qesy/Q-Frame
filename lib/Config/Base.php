@@ -1,4 +1,5 @@
 <?php
+use Helper\cookie;
 defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
 /*
  * Name : Collection
@@ -15,7 +16,7 @@ abstract class Base {
 	public $temp_arr = array ();
 	public $cookieObj;
 	function __construct() {
-		// $this->cookieObj = cookie::get_instance ();
+		$this->cookieObj = cookie::get_instance ();
 	}
 	public function createSn() { // -- Name : 生成编号 --
 		return WEB_PREFIX . '-' . uniqid ( rand ( 100, 999 ), false );
@@ -38,8 +39,6 @@ abstract class Base {
 		foreach ( $jsArr as $key => $val ) {
 			echo '<script type="text/javascript" src="' . JS_PATH . $val . '.js?v=' . VERSION . '" charset="utf-8"></script>';
 		}
-	}
-	public function LoadModel() {
 	}
 	public function page_bar($count, $size, $url = '', $num = 9, $pageNum = 1) { // -- 分页 --
 		if ($count <= 0) {

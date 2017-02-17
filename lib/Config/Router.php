@@ -79,7 +79,7 @@ class Router {
 					'method' => 'err',
 					'fun_arr' => array () 
 			);
-			require $controller_arr ['url'];
+			require_once $controller_arr ['url'];
 		}
 		self::$s_controller = $controller_arr ['name'];
 		self::$s_method = $controller_arr ['method'];
