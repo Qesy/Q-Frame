@@ -1,29 +1,22 @@
-{  
-  "name": "qesy/q-frame",  
-  "description": "A simple php Framework . ", 
-  "type": "qframe1",   
-  "keywords": [  
-	"QFrame",  
-    "PHP",  
-    "Framework" ,
-	"Qesy"
-  ],  
-  "homepage": "https://github.com/qesy/q-frame",     
-  "license": "Apache-2.0",  
-  "authors": [  
-    {  
-      "name": "Qesy",  
-      "email": "762264@qq.com"  
-    }  
-  ],
-  "require": {  
-    "php": ">=5.4.0"     
+{
+  "name" : "qesy/q-frame",
+  "description" : "A simple php Framework . ",
+  "version" : "1.0.0",
+  "require" : {
+    "php" : ">=5.4.0"
   },
-  "support": {  
-    "source": "https://github.com/qesy/q-frame"  
-  },      
-  "config": {
-        "preferred-install": "dist"
-  } 
-  
+  "license" : "Apache-2.0",
+  "keywords" : [ "QFrame", "PHP", "Framework", "Qesy" ],
+  "type" : "qframe1",
+  "support" : {
+    "source" : "https://github.com/qesy/q-frame"
+  },
+  "config" : {
+    "preferred-install" : "dist"
+  },
+  "homepage" : "https://github.com/qesy/q-frame",
+  "authors" : [ {
+    "name" : "Qesy",
+    "email" : "762264@qq.com"
+  } ]
 }
