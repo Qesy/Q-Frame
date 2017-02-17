@@ -9,7 +9,7 @@
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-// error_reporting ( E_ALL ^ E_NOTICE );
+error_reporting ( E_ALL ^ E_NOTICE );
 define ( 'DIRNAME', pathinfo ( __FILE__, PATHINFO_DIRNAME ) );
 define ( 'SYS_PATH', DIRNAME . '/system/' );
 define ( 'LIB_PATH', DIRNAME . '/lib/' );
