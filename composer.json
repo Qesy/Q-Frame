@@ -1,0 +1,26 @@
+{  
+  "name": "Qesy/QFrame",  
+  "description": "A simple php Framework . ",  
+  "keywords": [  
+	"QFrame",  
+    "PHP",  
+    "Framework" ,
+	"Qesy",	
+  ],  
+  "homepage": "https://github.com/Qesy/QFrame",  
+  "type": "php framework",  
+  "license": "Apache2",  
+  "support": {  
+    "source": "https://github.com/Qesy/QFrame"  
+  },  
+  "authors": [  
+    {  
+      "name": "Qesy",  
+      "email": "762264@qq.com"  
+    }  
+  ],  
+  "minimum-stability": "stable",  
+  "require": {  
+    "php": ">=5.4.0"     
+  }
+}  

@@ -30,7 +30,7 @@ class Router {
 		if (php_sapi_name () == 'cli') {
 			$uri = implode ( '/', array_slice ( $_SERVER ['argv'], 1 ) );
 		} else {
-			$uri = ! strpos ( $_SERVER ['REDIRECT_URL'], $this->_default ['Extend'] ) ? substr ( $_SERVER ['REDIRECT_URL'], strlen ( SITE_PATH ) ) : substr ( $_SERVER ['REDIRECT_URL'], strlen ( SITE_PATH ), - strlen ( $this->_default ['Extend'] ) );
+			$uri = ! strpos ( $_SERVER ['PATH_INFO'], $this->_default ['Extend'] ) ? substr ( $_SERVER ['PATH_INFO'], strlen ( SITE_PATH ) ) : substr ( $_SERVER ['PATH_INFO'], strlen ( SITE_PATH ), - strlen ( $this->_default ['Extend'] ) );
 		}
 		if (strpos ( $uri, 'poweredByQesy' ) !== false) {
 			echo "powered By Qesy <br>\n";
