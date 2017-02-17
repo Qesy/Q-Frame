@@ -1,5 +1,5 @@
 {  
-  "name": "Qesy/QFrame",  
+  "name": "qesy/q-frame",  
   "description": "A simple php Framework . ",  
   "keywords": [  
 	"QFrame",  
@@ -7,11 +7,11 @@
     "Framework" ,
 	"Qesy"
   ],  
-  "homepage": "https://github.com/Qesy/QFrame",  
+  "homepage": "https://github.com/qesy/q-frame",  
   "type": "php framework",  
   "license": "Apache2",  
   "support": {  
-    "source": "https://github.com/Qesy/QFrame"  
+    "source": "https://github.com/qesy/q-frame"  
   },  
   "authors": [  
     {  
