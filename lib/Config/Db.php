@@ -166,7 +166,7 @@ abstract class Db {
 	 */
 	public static function set_index($arr, $key) {
 		if (empty ( $arr ))
-			return;
+			return $arr;
 		$temp = array ();
 		foreach ( $arr as $val ) {
 			if (! isset ( $val [$key] )) {
