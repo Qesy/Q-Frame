@@ -81,7 +81,7 @@ class Db_pdo extends Db {
 		if (empty ( $index )) {
 			return $this->query ( $sql );
 		} else {
-			return $this->set_index ( $this->q_select ( $sql ), $index );
+			return $this->set_index ( $this->query ( $sql ), $index );
 		}
 	}
 	public function selectAll($cond_arr = '', $field = '*', $tb_name = 0, $index = 0, $limit = '', $sort = '', $isDebug = 0, &$count) {
