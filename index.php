@@ -9,13 +9,14 @@
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-// error_reporting ( E_ALL ^ E_NOTICE );
+error_reporting ( E_ALL ^ E_NOTICE );
+define('SELF', pathinfo(__FILE__, PATHINFO_BASENAME)); //-- fileName --
 define ( 'DIRNAME', pathinfo ( __FILE__, PATHINFO_DIRNAME ) );
 define ( 'SYS_PATH', DIRNAME . '/system/' );
 define ( 'LIB_PATH', DIRNAME . '/lib/' );
 define ( 'STATIC_PATH', DIRNAME . '/static/' );
 define ( 'SITE_PATH', substr ( $_SERVER ['SCRIPT_NAME'], 0, - 9 ) );
-define ( 'SITE_URL', $_SERVER ['REDIRECT_URL'] );
+define ( 'SITE_URL', explode('?', $_SERVER['REQUEST_URI'])[0]);
 define ( 'EXTEND', '.php' );
 define ( 'IMG_PATH', SITE_PATH . 'static/images/' );
 define ( 'JS_PATH', SITE_PATH . 'static/scripts/' );
