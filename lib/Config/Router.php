@@ -27,10 +27,9 @@ class Router {
 	}
 	private function _fetch_url() {
 		$controller_arr = array ();
+		$uri = SITE_PATH;
 		if (php_sapi_name () == 'cli') {
 			$uri = implode ( '/', array_slice ( $_SERVER ['argv'], 1 ) );
-		} else {
-			$uri = ! strpos ( SITE_URL, $this->_default ['Extend'] ) ? SITE_URL : substr ( SITE_URL, 0, - strlen ( $this->_default ['Extend'] ) );
 		}
 		if (strpos ( $uri, 'poweredByQesy' ) !== false) {
 			echo "powered By Qesy <br>\n";
