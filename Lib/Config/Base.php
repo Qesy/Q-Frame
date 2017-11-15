@@ -15,7 +15,7 @@ abstract class Base {
 	public $temp_arr = array ();
 	public $cookieObj;
 	function __construct() {
-		$this->cookieObj = Helper\cookie::get_instance();
+		$this->cookieObj = Helper\Cookie::get_instance();
 	}
 	public function createSn() { // -- Name : 生成编号 --
 		return WEB_PREFIX . '-' . uniqid ( rand ( 100, 999 ), false );
@@ -74,56 +74,6 @@ abstract class Base {
 				& $clss,
 				$controllerArr ['method'] . '_Action' 
 		), $fun_arr );
-	}
-	public function s_send($address, $name, $title, $content, $replace_arr = array(), $type = 'default') {
-		$temp = file_get_contents ( 'static/mail/' . $type . '.html' );
-		$mailObj = $this->load_model ( 'QCMS_Mail' );
-		$rs = $mailObj->selectOne ();
-		$mail = new PHPMailer ();
-		$mail->IsSMTP (); // 启用SMTP
-		$mail->Host = $rs ['smtp']; // SMTP服务器
-		$mail->SMTPAuth = true; // 开启SMTP认证
-		$mail->Username = $rs ['account']; // SMTP用户名
-		$mail->Password = $rs ['password']; // SMTP密码
-		$mail->From = $rs ['send']; // 发件人地址
-		$mail->FromName = $rs ['username']; // 发件人
-		$mail->AddAddress ( $address, $name );
-		$mail->AddReplyTo ( $mail->Username, $mail->FromName ); // 回复地址
-		$mail->WordWrap = 50; // 设置每行字符长度
-		$mail->IsHTML ( true ); // 是否HTML格式邮件
-		$mail->CharSet = "utf-8"; // 这里指定字符集！
-		$mail->Encoding = "base64";
-		
-		$search_sys = array (
-				'{title}',
-				'{content}',
-				'{date}',
-				'{time}',
-				'{webname}',
-				'{host}',
-				'{username}' 
-		);
-		$replace_sys = array (
-				$title,
-				$content,
-				date ( 'Y-m-d' ),
-				date ( 'Y-m-d H:i:s' ),
-				$this->web ['webname'],
-				'http://' . WEB_DOMAIN,
-				$name 
-		);
-		foreach ( $replace_arr as $key => $val ) {
-			$search_sys [] = '{' . $key . '}';
-			$replace_sys [] = $val;
-		}
-		$str = str_replace ( $search_sys, $replace_sys, $temp );
-		$mail->Subject = $title; // 邮件主题
-		$mail->Body = $str; // 邮件内容
-		$mail->AltBody = $str; // 邮件正文不支持HTML的备用显示
-		if (! $mail->Send ()) {
-			return False;
-		}
-		return TRUE;
 	}
 }
 ?>

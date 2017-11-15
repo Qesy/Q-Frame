@@ -13,7 +13,7 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-class cookie {
+class Cookie {
 	private static $s_instance;
 	public $expire = 72; // -- hour --
 	public static function get_instance() {

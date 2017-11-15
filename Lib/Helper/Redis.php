@@ -13,7 +13,7 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-class redis {
+class Redis {
 	private static $_redis = null;
 	const CACHETIME = 1209600; // 缓存2周
 	private static function __getRedis() {

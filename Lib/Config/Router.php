@@ -28,6 +28,10 @@ class Router {
 	private function _fetch_url() {
 		$controller_arr = array ();
 		$uri = SITE_PATH;
+		$Extend = stripos($uri, $this->_default['Extend']);
+		if ($Extend){
+			$uri = substr($uri, 0, stripos($uri, $this->_default['Extend']));
+		}
 		if (php_sapi_name () == 'cli') {
 			$uri = implode ( '/', array_slice ( $_SERVER ['argv'], 1 ) );
 		}
@@ -40,10 +44,10 @@ class Router {
 			echo "UserAgent : " . $_SERVER ['HTTP_USER_AGENT'] . "<br>\n";
 			exit ();
 		}
-		if (! $uri) {
+		if ($uri == '/') {
 			
 			$controller_arr ['name'] = $this->_default ['DefaultController'];
-			$controller_arr ['url'] = SYS_PATH . 'controller/' . $this->_default ['DefaultController'] . EXTEND;
+			$controller_arr ['url'] = SYS_PATH . 'Controller/' . $this->_default ['DefaultController'] . EXTEND;
 			$controller_arr ['method'] = $this->_default ['DefaultFunction'];
 		} else {
 			$uri_arr = explode ( $this->_default ['Url'], $uri );
@@ -51,9 +55,9 @@ class Router {
 			foreach ( $uri_arr as $key => $val ) {
 				$file = $url . $val;
 				$url .= $val . $this->_default ['Url'];
-				if (file_exists ( SYS_PATH . 'controller/' . $file . EXTEND )) {
+				if (file_exists ( SYS_PATH . 'Controller/' . $file . EXTEND )) {
 					$controller_arr ['name'] = $val;
-					$controller_arr ['url'] = SYS_PATH . 'controller/' . $file . EXTEND;
+					$controller_arr ['url'] = SYS_PATH . 'Controller/' . $file . EXTEND;
 					$fun_url = substr ( $uri, strlen ( $file ) + 1 );
 					$fun_arr = explode ( $this->_default ['Url'], $fun_url );
 					$controller_arr ['method'] = empty ( $fun_arr [0] ) ? 'index' : $fun_arr [0];
@@ -64,18 +68,19 @@ class Router {
 		}
 		return empty ( $controller_arr ) ? array (
 				'name' => 'home',
-				'url' => SYS_PATH . 'controller/home.php',
+				'url' => SYS_PATH . 'Controller/home.php',
 				'method' => 'err',
 				'fun_arr' => array () 
 		) : $controller_arr;
 	}
 	private function view_controller() {
 		$controller_arr = self::_fetch_url ();
+		var_dump($controller_arr);exit;
 		require $controller_arr ['url'];
 		if (! method_exists ( $controller_arr ['name'], $controller_arr ['method'] . '_Action' )) {
 			$controller_arr = array (
 					'name' => 'home',
-					'url' => SYS_PATH . 'controller/home.php',
+					'url' => SYS_PATH . 'Controller/home.php',
 					'method' => 'err',
 					'fun_arr' => array () 
 			);

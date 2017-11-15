@@ -13,7 +13,7 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-class session {
+class Session {
 	private static $s_instance;
 	public static function get_instance() {
 		if (! isset ( self::$s_instance )) {

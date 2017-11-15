@@ -13,7 +13,7 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-class memcached {
+class Memcached {
 	private $_memcacheObj;
 	private static $s_instance;
 	public $memcahceTime = 3600;

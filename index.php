@@ -9,17 +9,17 @@
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
+
 error_reporting ( E_ALL ^ E_NOTICE );
 define ( 'DIRNAME', pathinfo ( __FILE__, PATHINFO_DIRNAME ) );
-define ( 'SITE_PATH', $_SERVER ['PATH_INFO']);
-define ( 'SYS_PATH', DIRNAME . '/system/' );
-define ( 'LIB_PATH', DIRNAME . '/lib/' );
-define ( 'STATIC_PATH', DIRNAME . '/static/' );
+define ( 'SYS_PATH', DIRNAME . '/System/' );
+define ( 'LIB_PATH', DIRNAME . '/Lib/' );
+define ( 'STATIC_PATH', DIRNAME . '/Static/' );
 define ( 'EXTEND', '.php' );
-define ( 'IMG_PATH', SITE_PATH . 'static/images/' );
-define ( 'JS_PATH', SITE_PATH . 'static/scripts/' );
-define ( 'CSS_PATH', SITE_PATH . 'static/styles/' );
-define ( 'CACHE_PATH', SITE_PATH . 'static/cache/' );
-date_default_timezone_set ( 'Asia/Shanghai' );
-require LIB_PATH . 'X' . EXTEND;
+define ( 'SITE_PATH', explode('?', $_SERVER ['REQUEST_URI'])[0] ); 
+define ( 'IMG_PATH', SITE_PATH . 'Static/images/' );
+define ( 'JS_PATH', SITE_PATH . 'Static/scripts/' );
+define ( 'CSS_PATH', SITE_PATH . 'Static/styles/' );
+define ( 'CACHE_PATH', SITE_PATH . 'Static/cache/' );
+require LIB_PATH . 'X' . EXTEND;  
 ?>

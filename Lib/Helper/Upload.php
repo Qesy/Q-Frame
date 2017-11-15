@@ -3,7 +3,7 @@
 namespace Helper;
 
 defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
-class upload {
+class Upload {
 	private static $s_instance;
 	private $_type = array (
 			'image/pjpeg',
