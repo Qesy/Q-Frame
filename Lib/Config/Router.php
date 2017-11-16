@@ -98,7 +98,7 @@ class Router {
 	private function urlConvent($url){
 		foreach($this->_urlConfig as $urlSet){
 			if(strpos($url, $urlSet['search']) === 0){
-				return $urlSet['action'];				
+				return $urlSet['action'].substr($url, strlen($urlSet['search']));				
 			}
 		}
 		return '/home/err';

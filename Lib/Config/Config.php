@@ -28,7 +28,7 @@ function db_config($key) {
 }
 function site_config() {
 	return array (
-			'UrlType' => '0',
+			'UrlType' => '1',
 			'Extend' => '.html',
 			'DefaultController' => 'index',
 			'DefaultFunction' => 'index',
