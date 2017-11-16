@@ -12,11 +12,13 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  */
 class Router {
 	private $_default;
+	private $_urlConfig;
 	private static $s_instance;
 	public static $s_controller;
 	public static $s_method;
 	function __construct() {
 		$this->_default = site_config ();
+		$this->_urlConfig = url_config();
 		self::view_controller ();
 	}
 	public static function get_instance() {
@@ -25,13 +27,8 @@ class Router {
 		}
 		return self::$s_instance;
 	}
-	private function _fetch_url() {
-		$controller_arr = array ();
-		$uri = SITE_PATH;
-		$Extend = stripos($uri, $this->_default['Extend']);
-		if ($Extend){
-			$uri = substr($uri, 0, stripos($uri, $this->_default['Extend']));
-		}
+	private function _fetch_url($uri) {
+		$controller_arr = array ();	
 		if (php_sapi_name () == 'cli') {
 			$uri = implode ( '/', array_slice ( $_SERVER ['argv'], 1 ) );
 		}
@@ -74,8 +71,15 @@ class Router {
 		) : $controller_arr;
 	}
 	private function view_controller() {
-		$controller_arr = self::_fetch_url ();
-		var_dump($controller_arr);exit;
+		$uri = SITE_PATH;
+		$Extend = stripos($uri, $this->_default['Extend']);
+		if ($Extend){
+			$uri = substr($uri, 0, $Extend);
+		}
+		if($this->_default['UrlType'] == 1){ 
+			$uri = self::urlConvent($uri);			
+		}
+		$controller_arr = self::_fetch_url ($uri);
 		require $controller_arr ['url'];
 		if (! method_exists ( $controller_arr ['name'], $controller_arr ['method'] . '_Action' )) {
 			$controller_arr = array (
@@ -89,6 +93,15 @@ class Router {
 		self::$s_controller = $controller_arr ['name'];
 		self::$s_method = $controller_arr ['method'];
 		Base::insert_func_array ( $controller_arr );
+	}
+	
+	private function urlConvent($url){
+		foreach($this->_urlConfig as $urlSet){
+			if(strpos($url, $urlSet['search']) === 0){
+				return $urlSet['action'];				
+			}
+		}
+		return '/home/err';
 	}
 }
 ?>

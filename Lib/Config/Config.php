@@ -28,11 +28,18 @@ function db_config($key) {
 }
 function site_config() {
 	return array (
+			'UrlType' => '0',
 			'Extend' => '.html',
 			'DefaultController' => 'index',
 			'DefaultFunction' => 'index',
 			'Language' => 'en',
 			'Url' => '/' 
+	);
+}
+
+function url_config(){
+	return array(
+			array('search' =>'/admin/news' , 'action' => '/index/index'),			
 	);
 }
 const WEB_DOMAIN = 'www.qframework.com';
