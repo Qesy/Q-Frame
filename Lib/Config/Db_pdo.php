@@ -41,6 +41,10 @@ class Db_pdo extends Db {
 		$this->sqlSetArr ['Fetch'] = $Fetch;
 		return $this;
 	}
+	public function SetInsert($Insert){
+		$this->sqlSetArr ['Insert'] = $Insert;
+		return $this;
+	}
 	public function SetIsDebug($IsDebug) {
 		$this->sqlSetArr ['IsDebug'] = $IsDebug;
 		return $this;
