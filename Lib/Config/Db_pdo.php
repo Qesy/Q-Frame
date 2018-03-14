@@ -17,8 +17,8 @@ class Db_pdo extends Db {
 		$this->sqlSetArr ['Cond'] = $Cond;
 		return $this;
 	}
-	public function SetFiend($Fiend) {
-		$this->sqlSetArr ['Fiend'] = $Fiend;
+	public function SetField($Field) {
+		$this->sqlSetArr ['Field'] = $Field;
 		return $this;
 	}
 	public function SetTbName($TbName) {
@@ -97,6 +97,17 @@ class Db_pdo extends Db {
 		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
 		$value_str = parent::get_sql_insert ( $insert_arr );
 		$sql = "INSERT INTO " . $this->p_dbConfig ['Prefix'] . $this->p_table_name [$tb_name] . $value_str . "";
+		! $isDebug || var_dump ( $sql );
+		return $this->exec ( $sql );
+	}
+	public function insertBatch($insert_arr = array(), $tb_name = 0, $isDebug = 0){
+		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
+		$keyStr =  implode(', ', array_keys($insert_arr[0]));
+		$valStrArr = array();
+		foreach($insert_arr as $k => $v){
+			$valStrArr[] = "('".implode("', '", array_values($v))."')" ;
+		}
+		$sql = "INSERT INTO " . $tb_name . ' ('.$keyStr .') VALUES '. implode(',', $valStrArr);
 		! $isDebug || var_dump ( $sql );
 		return $this->exec ( $sql );
 	}
