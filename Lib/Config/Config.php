@@ -17,7 +17,7 @@ function db_config($key) {
 					'Host' => '127.0.0.1',  
 					'Accounts' => 'root',
 					'Password' => 'root',
-					'Name' => 'qcms',
+					'Name' => 'weishop',
 					'Port' => '3306',
 					'Prefix' => 'sg_',
 					'Charset' => 'utf8' 
@@ -28,7 +28,7 @@ function db_config($key) {
 }
 function site_config() {
 	return array (
-			'UrlType' => '1',
+			'UrlType' => '0',
 			'Extend' => '.html',
 			'DefaultController' => 'index',
 			'DefaultFunction' => 'index',

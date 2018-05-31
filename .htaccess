@@ -1,16 +1,5 @@
 <IfModule mod_rewrite.c>
 RewriteEngine on
-RewriteCond $1 !^(index\.php|404\.php|static|upload|robots\.txt|favicon\.ico|uc)
-RewriteRule ^(.*)$ /index.php/$1 [L]
+RewriteCond $1 !^(index\.php|404\.php|Static|upload|robots\.txt|favicon\.ico|uc)
+RewriteRule ^(.*)$ /index.php [L]
 </IfModule>
-
-
-
-
-
-
-
-
-
-
-

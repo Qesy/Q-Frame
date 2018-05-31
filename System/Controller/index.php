@@ -1,4 +1,5 @@
 <?php
+use Model\GO_User;
 defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
 class Index extends Controllers {
 	function __construct() {
@@ -9,6 +10,9 @@ class Index extends Controllers {
 	}
 	
 	public function test_Action(){
+		$a = GO_User::get_instance();
+		var_dump($a);
+		$a->bbb();
 		echo 'test';
 	}
 }

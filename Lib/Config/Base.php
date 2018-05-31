@@ -70,10 +70,7 @@ abstract class Base {
 	public static function insert_func_array(array $controllerArr) { // -- Name : 回调函数 --
 		$fun_arr = isset ( $controllerArr ['funArr'] ) ? $controllerArr ['funArr'] : array ();
 		$clss = new $controllerArr ['name'] ();
-		call_user_func_array ( array (
-				& $clss,
-				$controllerArr ['method'] . '_Action' 
-		), $fun_arr );
+		call_user_func_array ( array (& $clss, $controllerArr ['method'] . '_Action'), $fun_arr );
 	}
 }
 ?>
