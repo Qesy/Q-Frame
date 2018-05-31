@@ -14,9 +14,6 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  *
  */
 class GO_User extends \Db_pdo {
-	public function bbb(){
-		echo 'xxx';
-		return;
-	}
+	
 }
 ?>
