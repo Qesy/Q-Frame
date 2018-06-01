@@ -1,5 +1,7 @@
 <?php
-defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
+use Helper as help;
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
+
 /*
  * Name : Collection
  * Date : 20120107
@@ -15,28 +17,28 @@ abstract class Base {
 	public $temp_arr = array ();
 	public $cookieObj;
 	function __construct() {
-		$this->cookieObj = Helper\Cookie::get_instance();
+		$this->cookieObj =  help\Cookie::get_instance();
 	}
 	public function createSn() { // -- Name : 生成编号 --
 		return WEB_PREFIX . '-' . uniqid ( rand ( 100, 999 ), false );
 	}
 	public function loadView($temp, $data = array()) { // -- Name : 加载模版 --
-		if (! is_file ( SYS_PATH . 'view/' . $temp . EXTEND ))
-			die ( SYS_PATH . 'view/' . $temp . EXTEND . ' not found !' );
+		if (! is_file ( PATH_SYS . 'View/' . $temp . EXTEND ))
+			die ( PATH_SYS . 'View/' . $temp . EXTEND . ' not found !' );
 		$this->temp_arr = empty ( $data ) ? $this->temp_arr : $data;
 		foreach ( $this->temp_arr as $key => $val ) {
 			$$key = $val;
 		}
-		require SYS_PATH . 'view/' . $temp . EXTEND;
+		require PATH_SYS . 'View/' . $temp . EXTEND;
 	}
 	public function loadCss(array $cssArr) { // -- Name : 加载CSS --
 		foreach ( $cssArr as $key => $val ) {
-			echo '<link href="' . CSS_PATH . $val . '.css?v=' . VERSION . '" rel="stylesheet" type="text/css" />';
+			echo '<link href="' . URL_CSS . $val . '.css?v=' . VERSION . '" rel="stylesheet" type="text/css" />';
 		}
 	}
 	public function loadScripts(array $jsArr) { // -- Name : 加载JS --
 		foreach ( $jsArr as $key => $val ) {
-			echo '<script type="text/javascript" src="' . JS_PATH . $val . '.js?v=' . VERSION . '" charset="utf-8"></script>';
+			echo '<script type="text/javascript" src="' . URL_JS . $val . '.js?v=' . VERSION . '" charset="utf-8"></script>';
 		}
 	}
 	public function page_bar($count, $size, $url = '', $num = 9, $pageNum = 1) { // -- 分页 --

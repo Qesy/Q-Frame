@@ -1,5 +1,5 @@
 <?php
-defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 
 /*
  * Name : Collection
@@ -19,7 +19,7 @@ function db_config($key) {
 					'Password' => 'root',
 					'Name' => 'weishop',
 					'Port' => '3306',
-					'Prefix' => 'sg_',
+					'Prefix' => 'ws_',
 					'Charset' => 'utf8' 
 			)
 	);

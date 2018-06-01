@@ -1,8 +1,6 @@
 <?php
-
-namespace Helper;
-
-defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
+namespace Helper; 
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 /*
  * Name : Collection
  * Date : 20120107

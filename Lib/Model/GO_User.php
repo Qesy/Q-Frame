@@ -2,7 +2,7 @@
 
 namespace Model;
 
-defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 /*
  * Name : Collection
  * Date : 20120107

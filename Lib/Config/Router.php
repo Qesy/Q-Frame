@@ -1,5 +1,5 @@
 <?php
-defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 /*
  * Name : Collection
  * Date : 20120107
@@ -52,9 +52,9 @@ class Router {
 			foreach ( $uri_arr as $key => $val ) {
 				$file = $url . $val;
 				$url .= $val . $this->_default ['Url'];
-				if (file_exists ( SYS_PATH . 'Controller/' . $file . EXTEND )) {
+				if (file_exists ( PATH_SYS . 'Controller/' . $file . EXTEND )) {
 					$controller_arr ['name'] = $val;
-					$controller_arr ['url'] = SYS_PATH . 'Controller/' . $file . EXTEND;
+					$controller_arr ['url'] = PATH_SYS . 'Controller/' . $file . EXTEND;
 					$fun_url = substr ( $uri, strlen ( $file ) + 1 );
 					$fun_arr = explode ( $this->_default ['Url'], $fun_url );
 					$controller_arr ['method'] = empty ( $fun_arr [0] ) ? 'index' : $fun_arr [0];
@@ -65,13 +65,13 @@ class Router {
 		}
 		return empty ( $controller_arr ) ? array (
 				'name' => 'home',
-				'url' => SYS_PATH . 'Controller/home.php',
+				'url' => PATH_SYS . 'Controller/home.php',
 				'method' => 'err',
 				'fun_arr' => array () 
 		) : $controller_arr;
 	}
 	private function view_controller() {
-		$uri = SITE_PATH;
+		$uri = URL_CURRENT;
 		$Extend = stripos($uri, $this->_default['Extend']);
 		if ($Extend){
 			$uri = substr($uri, 0, $Extend);
@@ -84,7 +84,7 @@ class Router {
 		if (! method_exists ( $controller_arr ['name'], $controller_arr ['method'] . '_Action' )) {
 			$controller_arr = array (
 					'name' => 'home',
-					'url' => SYS_PATH . 'Controller/home.php',
+					'url' => PATH_SYS . 'Controller/home.php',
 					'method' => 'err',
 					'fun_arr' => array () 
 			);

@@ -11,15 +11,16 @@
  */
 
 error_reporting ( E_ALL ^ E_NOTICE );
-define ( 'DIRNAME', pathinfo ( __FILE__, PATHINFO_DIRNAME ) );
-define ( 'SYS_PATH', DIRNAME . '/System/' );
-define ( 'LIB_PATH', DIRNAME . '/Lib/' );
-define ( 'STATIC_PATH', DIRNAME . '/Static/' );
+define ( 'PATH_DIRNAME', pathinfo ( __FILE__, PATHINFO_DIRNAME ) );
+define ( 'PATH_SYS', PATH_DIRNAME . '/System/' );
+define ( 'PATH_LIB', PATH_DIRNAME . '/Lib/' );
+define ( 'PATH_STATIC', PATH_DIRNAME . '/Static/' );
+define ( 'URL_ROOT', substr($_SERVER['PHP_SELF'], 0, -9) );
+define ( 'URL_CURRENT', substr(explode('?', $_SERVER ['REQUEST_URI'])[0], count(URL_ROOT))) ; 
+define ( 'URL_IMG', URL_ROOT . 'Static/images/' );
+define ( 'URL_JS', URL_ROOT . 'Static/scripts/' );
+define ( 'URL_CSS', URL_ROOT . 'Static/styles/' );
+define ( 'URL_BOOT', URL_ROOT.'Static/bootstrap/');
 define ( 'EXTEND', '.php' );
-define ( 'SITE_PATH', explode('?', $_SERVER ['REQUEST_URI'])[0] ); 
-define ( 'IMG_PATH', SITE_PATH . 'Static/images/' );
-define ( 'JS_PATH', SITE_PATH . 'Static/scripts/' );
-define ( 'CSS_PATH', SITE_PATH . 'Static/styles/' );
-define ( 'CACHE_PATH', SITE_PATH . 'Static/cache/' );
-require LIB_PATH . 'X' . EXTEND;  
+require PATH_LIB . 'X' . EXTEND;  
 ?>

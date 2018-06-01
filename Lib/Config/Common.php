@@ -1,5 +1,5 @@
 <?php
-if (! defined ( 'SYS_PATH' ))
+if (! defined ( 'PATH_SYS' ))
 	exit ( 'No direct script access allowed' );
 	/*
  * Name : Collection
@@ -18,7 +18,7 @@ function go_fun(array $urlArr) { // -- JS跳转 --
 	exec_script ( 'window.location.href="' . url ( $urlArr ) . '"' );
 	exit ();
 }
-function url(array $urlArr = array ('index')) { // -- 路径函数 --
+function url(array $urlArr = array ('index')) { // -- 路径函数 --	
 	$url = array ();
 	foreach ( $urlArr as $key => $val ) {
 		$url [] = $val;
@@ -57,7 +57,7 @@ function utf8Substr($str, $from, $len) { // -- 切utf8字符串 --
 	return preg_replace ( '#^(?:[\x00-\x7F]|[\xC0-\xFF][\x80-\xBF]+){0,' . $from . '}' . '((?:[\x00-\x7F]|[\xC0-\xFF][\x80-\xBF]+){0,' . $len . '}).*#s', '$1', $str );
 }
 function __autoload($classname) { // -- 自动加载类 --
-	$filename = LIB_PATH . $classname . '.php';
+	$filename = PATH_LIB . $classname . '.php';
 	$filename = str_replace('\\', '/', $filename);
 	if (file_exists ( $filename ))
 		require $filename;

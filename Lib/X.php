@@ -1,5 +1,5 @@
 <?php
-defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 
 /*
  * Name : Collection
@@ -11,13 +11,13 @@ defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-require LIB_PATH . 'Config/Common' . EXTEND;
-require LIB_PATH . 'Config/Base' . EXTEND;
-require LIB_PATH . 'Config/Controllers' . EXTEND;
-require LIB_PATH . 'Config/Db' . EXTEND;
-require LIB_PATH . 'Config/Db_pdo' . EXTEND;
-require LIB_PATH . 'Config/Config' . EXTEND;
-require LIB_PATH . 'Config/Router' . EXTEND;
+require PATH_LIB . 'Config/Common' . EXTEND;
+require PATH_LIB . 'Config/Base' . EXTEND;
+require PATH_LIB . 'Config/Controllers' . EXTEND;
+require PATH_LIB . 'Config/Db' . EXTEND;
+require PATH_LIB . 'Config/Db_pdo' . EXTEND;
+require PATH_LIB . 'Config/Config' . EXTEND;
+require PATH_LIB . 'Config/Router' . EXTEND;
 date_default_timezone_set ( 'Asia/Shanghai' );
 header("Server: QCMS", true);
 session_set_cookie_params ( 24 * 3600 );

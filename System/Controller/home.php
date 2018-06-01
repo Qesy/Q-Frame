@@ -1,5 +1,5 @@
 <?php
-defined ( 'SYS_PATH' ) || exit ( 'No direct script access allowed' );
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 class Home extends Controllers {
 	public function err_Action() {
 		header ( "HTTP/1.1 404 Not Found" );
