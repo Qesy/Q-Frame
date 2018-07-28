@@ -39,7 +39,7 @@ class XKS_User extends \Db_pdo {
 	}	
 	
 	public function Add(){
-		return $this->SetTbName(self::TABLE_NAME)->SetIsDebug(0) ->SetInsert(array('NickName' => $this->NickName)->ExecInsert();
+		return $this->SetTbName(self::TABLE_NAME)->SetIsDebug(0) ->SetInsert(array('NickName' => $this->NickName))->ExecInsert();
 	}
 	
 	public function Edit(){

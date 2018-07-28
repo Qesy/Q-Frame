@@ -13,13 +13,13 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 class Db_pdo extends Db {
 	public static $instance = array ();
 	
-	public static function get_instance($dbname = 0) {
+	public static function get_instance() {
 		$classFullName = get_called_class();
-		if (! isset ( self::$instance [$dbname] ) ) {
-			self::$instance [$dbname] = new $classFullName ( $dbname );
-			self::$instance ['key'] = $dbname;
+		if (! isset ( self::$_instance [$classFullName] ) ) {
+			$instance = self::$_instance [$classFullName] = new static();
+			return $instance;
 		}
-		return self::$instance [$dbname];
+		return self::$_instance [$classFullName];
 	}
 	
 	public function SetCond($Cond) {
