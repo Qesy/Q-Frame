@@ -41,10 +41,9 @@ class Router {
 			echo "UserAgent : " . $_SERVER ['HTTP_USER_AGENT'] . "<br>\n";
 			exit ();
 		}
-		if ($uri == '/') {
-			
+		if ($uri == false) {			
 			$controller_arr ['name'] = $this->_default ['DefaultController'];
-			$controller_arr ['url'] = SYS_PATH . 'Controller/' . $this->_default ['DefaultController'] . EXTEND;
+			$controller_arr ['url'] = PATH_SYS . 'Controller/' . $this->_default ['DefaultController'] . EXTEND;
 			$controller_arr ['method'] = $this->_default ['DefaultFunction'];
 		} else {
 			$uri_arr = explode ( $this->_default ['Url'], $uri );
