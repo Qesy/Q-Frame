@@ -37,11 +37,6 @@ function site_config() {
 	);
 }
 
-function url_config(){
-	return array(
-			array('search' =>'/admin/news' , 'action' => '/index/index'),			
-	);
-}
 const WEB_DOMAIN = 'www.qframework.com';
 const WEB_TITLE = 'Qesy Framework';
 const WEB_PREFIX = 'QFrame';

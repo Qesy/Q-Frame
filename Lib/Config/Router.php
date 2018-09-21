@@ -95,12 +95,24 @@ class Router {
 	}
 	
 	private function urlConvent($url){
-		foreach($this->_urlConfig as $urlSet){
-			if(strpos($url, $urlSet['search']) === 0){
-				return $urlSet['action'].substr($url, strlen($urlSet['search']));				
-			}
-		}
-		return '/home/err';
+	    foreach($this->_urlConfig as $v){
+	        $v['search'] = '/^'.str_replace('/', '\/', $v['search']).'$/';
+	        if(preg_match($v['search'],$url, $matches)){
+	            $search = $replace = array();
+	            foreach($matches as $sk => $sv){
+	                if($sk == 0) continue;
+	                $search[] = '{$'.$sk.'}';
+	                $replace[] = $sv;
+	            }
+	            return str_replace($search, $replace, $v['action']);
+	        }
+	    }
+	    /* foreach($this->_urlConfig as $urlSet){
+	     if(strpos($url, $urlSet['search']) === 0){
+	     return $urlSet['action'].substr($url, strlen($urlSet['search']));
+	     }
+	     } */
+	    return $url;
 	}
 }
 ?>

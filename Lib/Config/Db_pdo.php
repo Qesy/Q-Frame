@@ -11,7 +11,7 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  *
  */
 class Db_pdo extends Db {
-	public static $instance = array ();
+	public static $_instance = array ();
 	
 	public static function get_instance() {
 		$classFullName = get_called_class();
@@ -25,6 +25,10 @@ class Db_pdo extends Db {
 	public function SetCond($Cond) {
 		$this->sqlSetArr ['Cond'] = $Cond;
 		return $this;
+	}
+	public function SetUpdate($Update){
+	    $this->sqlSetArr ['Update'] = $Update;
+	    return $this;
 	}
 	public function SetField($Field) {
 		$this->sqlSetArr ['Field'] = $Field;
