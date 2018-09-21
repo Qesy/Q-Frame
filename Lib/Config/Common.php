@@ -23,7 +23,7 @@ function url(array $urlArr = array ('index')) { // -- 路径函数 --
 	foreach ( $urlArr as $key => $val ) {
 		$url [] = $val;
 	}
-	return SITE_PATH . implode ( '/', $url ) . '.html';
+	return URL_ROOT . implode ( '/', $url ) . '.html';
 }
 function ip() { // -- 获取IP --
 	$cip = 0;
