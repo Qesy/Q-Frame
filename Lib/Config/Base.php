@@ -19,6 +19,12 @@ abstract class Base {
 	function __construct() {
 		$this->cookieObj =  help\Cookie::get_instance();
 	}
+	public function veriPara(array $request , array $paraArr){
+	    foreach($paraArr as $v){
+	        if(empty($request[$v])) return false;
+	    }
+	    return true;
+	}
 	public function createSn() { // -- Name : 生成编号 --
 		return WEB_PREFIX . '-' . uniqid ( rand ( 100, 999 ), false );
 	}
