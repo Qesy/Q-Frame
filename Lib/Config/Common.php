@@ -13,6 +13,7 @@ if (! defined ( 'PATH_SYS' ))
  */
 function exec_script($str) { // -- 运行JS --
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><script>' . $str . '</script>';
+	exit ();
 }
 function go_fun(array $urlArr) { // -- JS跳转 --
 	exec_script ( 'window.location.href="' . url ( $urlArr ) . '"' );
