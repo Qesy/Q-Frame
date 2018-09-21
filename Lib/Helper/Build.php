@@ -165,8 +165,9 @@ class Build {
 	    $num = count($keyArr);
 	    if($IsEdit || $IsDel) $num++;
 	    if(!empty($Page)){
-	       $str .= '</tbody><tfoot><tr><td colspan="'.$num.'" class="page">'.$Page.'</td></tr></tfoot></table>';
+	       $str .= '</tbody><tfoot><tr><td colspan="'.$num.'" class="page">'.$Page.'</td></tr></tfoot>';
 	    }
+	    $str .= '</table>';
 	    return $str;
 	}
 	
