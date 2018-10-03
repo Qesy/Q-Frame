@@ -6,22 +6,21 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 class Upload {
 	private static $s_instance;
 	private $_type = array (
-			'image/pjpeg',
-			'image/jpeg',
-			'image/gif',
-			'image/png',
-			'image/x-png',
-			'image/bmp',
-			'application/x-shockwave-flash',
-			'application/octet-stream',
-			'image/vnd.adobe.photoshop' 
+			'jpg',
+			'jpeg',
+			'gif',
+			'png',
+			'webp',
+			'bmp',
+	       'xls',
+	       'xlsx',
 	);
 	private $_size = 2; // -- m --
 	private $_dir;
 	private $_name;
 	function __construct() {
 		$this->_name = uniqid ( rand ( 100, 999 ) ) . rand ( 1, 9 );
-		$this->_dir = 'static/upload/source/' . date ( 'Ymd' ) . '/';
+		$this->_dir = 'Static/upload/source/' . date ( 'Ymd' ) . '/';
 	}
 	public static function get_instance() {
 		if (! isset ( self::$s_instance )) {
@@ -29,15 +28,16 @@ class Upload {
 		}
 		return self::$s_instance;
 	}
-	public function upload_file($file_arr) {
-		$ext = substr ( strrchr ( $file_arr ['name'], '.' ), 1 );
-		if (! is_uploaded_file ( $file_arr ['tmp_name'] ) || ! in_array ( $file_arr ['type'], $this->_type )) {
+	public function upload_file($fileRs) {
+		$ext = substr ( strrchr ( $fileRs ['name'], '.' ), 1 );
+
+		if (! is_uploaded_file ( $fileRs ['tmp_name'] ) || ! in_array ( $ext, $this->_type )) {
 			return - 1;
 		}
-		if ($file_arr ['size'] > ($this->_size * 1024 * 1024)) {
+		if ($fileRs ['size'] > ($this->_size * 1024 * 1024)) {
 			return - 2;
 		}
-		return self::_move_file ( $file_arr ['tmp_name'], $ext );
+		return self::_move_file ( $fileRs ['tmp_name'], $ext );
 	}
 	private function _move_file($file, $ext) {
 		$url = $this->_dir . $this->_name . '.' . $ext;
@@ -47,7 +47,7 @@ class Upload {
 		if (! move_uploaded_file ( $file, $url )) {
 			return - 3;
 		}
-		return '/' . $url;
+		return URL_ROOT . $url;
 	}
 }
 ?>
