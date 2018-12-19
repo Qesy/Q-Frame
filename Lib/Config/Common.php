@@ -43,16 +43,25 @@ function thumb($url, $width, $heiht, $noWaterMark = 0) { // -- 缩略图 --
 	$path = substr ( $url, 0, - 4 );
 	return empty ( $noWaterMark ) ? $path . '_w' . $width . '_h' . $heiht . $ext : $path . '_w' . $width . '_h' . $heiht . '_' . $noWaterMark . $ext;
 }
-function api(array $pathArr, array $paraArr, $url) { // -- CURL封装 --
-	$url = AD_URL . implode ( '/', $pathArr );
-	$ch = curl_init ( $url );
-	curl_setopt ( $ch, CURLOPT_POST, true );
-	curl_setopt ( $ch, CURLOPT_POSTFIELDS, $paraArr );
-	curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, true );
-	$result = curl_exec ( $ch );
-	$info = curl_getinfo ( $ch );
-	curl_close ( $ch );
-	return $result;
+function api(array $pathArr, array $paraArr, $url, $isPost = true, $isHttps = 0) { // -- CURL封装 --
+		$url = $url . implode ( '/', $pathArr );
+    	if(!$isPost){
+    		$url .= '?'.http_build_query($paraArr);
+    	}
+    	$ch = curl_init( $url );
+    	if($isPost){
+    		curl_setopt( $ch, CURLOPT_POST, true );
+    		curl_setopt( $ch, CURLOPT_POSTFIELDS, $paraArr );		
+    	}
+    	if($isHttps){
+    		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
+    		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1); // 从证书中检查SSL加密算法是否存在
+    	}
+    	curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, true );
+    	$result = curl_exec ( $ch );
+    	$info = curl_getinfo ( $ch );
+    	curl_close ( $ch );
+    	return $result;
 }
 function utf8Substr($str, $from, $len) { // -- 切utf8字符串 --
 	return preg_replace ( '#^(?:[\x00-\x7F]|[\xC0-\xFF][\x80-\xBF]+){0,' . $from . '}' . '((?:[\x00-\x7F]|[\xC0-\xFF][\x80-\xBF]+){0,' . $len . '}).*#s', '$1', $str );
