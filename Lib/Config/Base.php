@@ -53,8 +53,8 @@ abstract class Base {
 		}
 		$toall = ceil ( $count / $size );
 		($pageNum <= $toall) || $pageNum = $toall;
-		$pre = ($pageNum <= 1) ? '<li><a href="' . str_replace ( '{page}', 1, $url ) . '">上一页</a></li>' : '<li><a href="' . str_replace ( '{page}', $pageNum - 1, $url ) . '">上一页</a></li>';
-		$next = ($pageNum >= $toall) ? '<li><a href="' . str_replace ( '{page}', $toall, $url ) . '">下一页</a></li>' : '<li><a href="' . str_replace ( '{page}', $pageNum + 1, $url ) . '">下一页</a></li>';
+		$pre = ($pageNum <= 1) ? '<li class="page-item"><a href="' . str_replace ( '{page}', 1, $url ) . '" class="page-link">上一页</a></li>' : '<li class="page-item"><a href="' . str_replace ( '{page}', $pageNum - 1, $url ) . '" class="page-link">上一页</a></li>';
+		$next = ($pageNum >= $toall) ? '<li class="page-item"><a href="' . str_replace ( '{page}', $toall, $url ) . '" class="page-link">下一页</a></li>' : '<li class="page-item"><a href="' . str_replace ( '{page}', $pageNum + 1, $url ) . '" class="page-link">下一页</a></li>';
 		$start = $end = 1;
 		$toallStr = $str = '';
 		if ($toall <= $num) {
@@ -71,9 +71,9 @@ abstract class Base {
 			$end = ($pageNum + floor ( $num / 2 ));
 		}
 		for($i = $start; $i <= $end; $i ++) {
-			$str = ($pageNum == $i) ? '<li class="active"><a>' . $i . '</a></li>' : '<li><a href="' . str_replace ( '{page}', $i, $url ) . '">' . $i . '</a></li>';
+			$str .= ($pageNum == $i) ? '<li class="page-item active"><a class="page-link">' . $i . '</a></li>' : '<li class="page-item"><a href="' . str_replace ( '{page}', $i, $url ) . '" class="page-link">' . $i . '</a></li>';
 		}
-		return '<ul class="pagination">' . $pre . $str . $next . $toallStr . '</ul>';
+		return '<ul class="pagination justify-content-center">' . $pre . $str . $next . $toallStr . '</ul>';
 	}
 	public static function insert_func_array(array $controllerArr) { // -- Name : 回调函数 --
 		$fun_arr = isset ( $controllerArr ['funArr'] ) ? $controllerArr ['funArr'] : array ();

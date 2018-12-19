@@ -132,12 +132,12 @@ class Build {
 	 *  $keyArr = array('name' => ''标题'');
 	 */
 	public function Table(array $arr, $keyArr, $Page = '', $IsEdit = true, $IsDel = true){
-	    $str = '<table class="table table-bordered table-hover"><thead><tr>';
+	    $str = '<table class="table"><thead><tr>';
 	    foreach($keyArr as $k => $v){
-	        $str .= '<th>'.$v['Name'].'</th>';
+	        $str .= '<th  scope="col">'.$v['Name'].'</th>';
 	    }
 	    if($IsEdit || $IsDel){
-	        $str .= '<th>操作</th>';
+	        $str .= '<th  scope="col">操作</th>';
 	    }
 	    $str .= '</tr></thead><tbody>';
 	    foreach($arr as $k => $v){
@@ -146,9 +146,15 @@ class Build {
 	            switch ($sv['Type']){
 	                case 'Date':
 	                    $str .= '<td>'.date('Y-m-d', $v[$sk]).'</td>';break;
+                    case 'Time':
+                        $str .= '<td>'.date('Y-m-d H:i:s', $v[$sk]).'</td>';break;
                     case 'True':
-                        $IsTrue = ($v[$sk]) ? 'ok' : 'remove';
-                        $str .= '<td><span class="glyphicon glyphicon-'.$IsTrue.'" aria-hidden="true"></span></td>';break;
+                        $IsTrue = ($v[$sk]) ? 'success' : 'danger';
+                        $Text = ($v[$sk]) ? '是' : '否';
+                        $str .= '<td><span class="text-'.$IsTrue.'">'.$Text.'</span></td>';break;
+                    case 'Key':
+                        $str .= '<td>'.$keyArr[$sk]['Data'][$v[$sk]].'</td>';break;
+                        break;
 	                default:
 	                    $str .= '<td>'.$v[$sk].'</td>';break;
 	            }
@@ -156,8 +162,8 @@ class Build {
 	        }
 	        if($IsEdit || $IsDel){
 	            $ActArr = array();
-	            if($IsEdit) $ActArr[] = '<a href="'.url(array('backend', \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
-	            if($IsDel) $ActArr[] = '<a href="'.url(array('backend', \Router::$s_controller, 'del')).'?Id='.$v['Id'].'">删除</a>';
+	            if($IsEdit) $ActArr[] = '<a href="'.url(array('admin', \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
+	            if($IsDel) $ActArr[] = '<a href="'.url(array('admin', \Router::$s_controller, 'del')).'?Id='.$v['Id'].'">删除</a>';
 	            $str .= '<td>'.implode(' ', $ActArr).'</td>';
 	        }
 	        $str .= '</tr>';
