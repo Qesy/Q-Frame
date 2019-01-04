@@ -16,11 +16,17 @@ class Build {
 	public $Arr;
 	public $Html;
 	public $Js;
+	public $Module = 'admin';
+	public $UploadUrl;
 	public static function get_instance() {
 		if (! isset ( self::$s_instance )) {
 			self::$s_instance = new self ();
 		}
 		return self::$s_instance;
+	}
+	
+	function __construct(){
+	    $this->UploadUrl = url(array('backend', 'index', 'ajaxUpload'));
 	}
 	
 	/*
@@ -78,7 +84,7 @@ class Build {
                                   </div> ';
 	                   $this->Js .= 'UploadBtn["'.$v['Name'].'"] = $("#uploadImg_'.$v['Name'].'");      
                             new AjaxUpload(UploadBtn["'.$v['Name'].'"], {
-                              action: "'.url(array('backend', 'index', 'ajaxUpload')).'", 
+                              action: "'.$this->UploadUrl.'", 
                               name: "filedata",
                               onSubmit : function(file, ext){
                                 this.disable();     
@@ -97,18 +103,87 @@ class Build {
                           });
 	                       ';
 	                   break;
+	               case 'Slide':
+	                   //var_dump($v['Value']);exit;
+	                   foreach($v['Value'] as $sk => $sv){
+	                       $this->Html .= '<div class="form-group">
+                                    <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
+                                    <div class="input-group">
+                                      <input type="text" class="form-control" placeholder="'.$v['Placeholder'].'" name="'.$v['Name'].'[]" Id="Img_'.$v['Name'].'_'.$sk.'" value="'.$sv.'">
+                                      <span class="input-group-btn">
+                                        <button class="btn btn-success" id="uploadImg_'.$v['Name'].'_'.$sk.'" type="button">上传图片</button>
+                                      </span>
+                                    </div>
+                                  </div> ';
+	                       $this->Js .= 'UploadBtn["'.$v['Name'].'_'.$sk.'"] = $("#uploadImg_'.$v['Name'].'_'.$sk.'");
+                            new AjaxUpload(UploadBtn["'.$v['Name'].'_'.$sk.'"], {
+                              action: "'.$this->UploadUrl.'",
+                              name: "filedata",
+                              onSubmit : function(file, ext){
+                                this.disable();
+                              },
+                              onComplete: function(file, response){
+                                var jsonArr = JSON.parse(response);
+                                console.log(jsonArr.code)
+                                if(jsonArr.code != 0){
+                                  this.enable();
+                                  alert(jsonArr.msg);return;
+                                }
+                                window.clearInterval(interval);
+                                this.enable();
+                                $("#Img_'.$v['Name'].'_'.$sk.'").val(jsonArr.data.url)
+                              }
+                          });
+	                       ';
+	                   }
+	                   break;
 	               case 'textarea':
 	                   $this->Html .= '<div class="form-group">
                                     <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
                                     <textarea class="form-control" name="Content" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
                                   </div>';
 	                   break;
+	                   case 'editor':
+	                       $this->Html .= '<div class="form-group">
+                                    <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
+                                    <textarea class="form-control" name="Content" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
+                                  </div>';
+	                       $this->Js .= 'var editor;
+    KindEditor.ready(function(K) {
+      editor = K.create(\'textarea[name="Content"]\', {
+        allowFileManager : true,
+        themeType : "simple",
+        urlType : "absolute",
+        uploadJson : "'.$this->UploadUrl.'",
+        items : ["source","code","fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline",
+"removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
+"insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
+
+      })
+    })';
+	                       break;
 	               case 'disabled':
 	                   $this->Html .= '<div class="form-group">
                                         <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
                                         <input disabled="disabled" type="text" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
                                    </div>';
 	                   break;
+	               case 'money':
+	                   case 'disabled':
+	                       $this->Html .= '<div class="form-group">
+                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
+                                            <div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text">&yen;</span>
+  </div>
+  <input type="text" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
+  <div class="input-group-append">
+    <span class="input-group-text">.00</span>
+  </div>
+</div>
+                                        
+                                   </div>';
+	                       break;
 	               default:
 	                   $this->Html .= '<div class="form-group">
                                         <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
@@ -162,8 +237,8 @@ class Build {
 	        }
 	        if($IsEdit || $IsDel){
 	            $ActArr = array();
-	            if($IsEdit) $ActArr[] = '<a href="'.url(array('admin', \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
-	            if($IsDel) $ActArr[] = '<a href="'.url(array('admin', \Router::$s_controller, 'del')).'?Id='.$v['Id'].'">删除</a>';
+	            if($IsEdit) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
+	            if($IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?Id='.$v['Id'].'">删除</a>';
 	            $str .= '<td>'.implode(' ', $ActArr).'</td>';
 	        }
 	        $str .= '</tr>';
