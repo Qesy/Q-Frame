@@ -238,7 +238,7 @@ class Build {
 	        if($IsEdit || $IsDel){
 	            $ActArr = array();
 	            if($IsEdit) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
-	            if($IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?Id='.$v['Id'].'">删除</a>';
+	            if($IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?Id='.$v['Id'].'" onclick="return confirm(\'是否删除?\')">删除</a>';
 	            $str .= '<td>'.implode(' ', $ActArr).'</td>';
 	        }
 	        $str .= '</tr>';

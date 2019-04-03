@@ -57,7 +57,7 @@ class Router {
 					$fun_url = substr ( $uri, strlen ( $file ) + 1 );
 					$fun_arr = explode ( $this->_default ['Url'], $fun_url );
 					$controller_arr ['method'] = empty ( $fun_arr [0] ) ? 'index' : $fun_arr [0];
-					$controller_arr ['fun_arr'] = array_splice ( $fun_arr, 1 );
+					$controller_arr ['funArr'] = array_splice ( $fun_arr, 1 );
 					break;
 				}
 			}
@@ -66,7 +66,7 @@ class Router {
 				'name' => 'home',
 				'url' => PATH_SYS . 'Controller/home.php',
 				'method' => 'err',
-				'fun_arr' => array () 
+				'funArr' => array () 
 		) : $controller_arr;
 	}
 	private function view_controller() {
@@ -85,7 +85,7 @@ class Router {
 					'name' => 'home',
 					'url' => PATH_SYS . 'Controller/home.php',
 					'method' => 'err',
-					'fun_arr' => array () 
+					'funArr' => array () 
 			);
 			require_once $controller_arr ['url'];
 		}

@@ -47,34 +47,42 @@ abstract class Base {
 			echo '<script type="text/javascript" src="' . URL_JS . $val . '.js?v=' . VERSION . '" charset="utf-8"></script>';
 		}
 	}
-	public function page_bar($count, $size, $url = '', $num = 9, $pageNum = 1) { // -- 分页 --
-		if ($count <= 0) {
-			return;
-		}
-		$toall = ceil ( $count / $size );
-		($pageNum <= $toall) || $pageNum = $toall;
-		$pre = ($pageNum <= 1) ? '<li class="page-item"><a href="' . str_replace ( '{page}', 1, $url ) . '" class="page-link">上一页</a></li>' : '<li class="page-item"><a href="' . str_replace ( '{page}', $pageNum - 1, $url ) . '" class="page-link">上一页</a></li>';
-		$next = ($pageNum >= $toall) ? '<li class="page-item"><a href="' . str_replace ( '{page}', $toall, $url ) . '" class="page-link">下一页</a></li>' : '<li class="page-item"><a href="' . str_replace ( '{page}', $pageNum + 1, $url ) . '" class="page-link">下一页</a></li>';
-		$start = $end = 1;
-		$toallStr = $str = '';
-		if ($toall <= $num) {
-			$start = 1;
-			$end = $toall;
-		} elseif (($toall - $pageNum) > ceil ( $num / 2 ) && $pageNum < ceil ( $num / 2 )) {
-			$start = 1;
-			$end = $num;
-		} elseif (($toall - $pageNum) < ceil ( $num / 2 )) {
-			$start = ($toall - $num + 1);
-			$end = $toall;
+	
+    public function page_bar($Count, $Size) { // -- 分页 --
+	    $Num = 9;
+	    $PageNum = isset($_GET['P']) ? intval($_GET['P']) : 1;	    
+	    $Url = URL_ROOT.URL_CURRENT;
+		if ($Count <= 0) return '';
+		$Toall = ceil ( $Count / $Size );
+		($PageNum <= $Toall) || $PageNum = $Toall;
+		$PreGet = $NextGet = $_GET;
+		$PreGet['P'] = ($PageNum <= 1) ? 1 : $_GET['P']-1;
+		$PreUrl = $Url.'?'.http_build_query($PreGet);
+		$PreStr = '<li class="page-item"><a href="' . $PreUrl . '" class="page-link">上一页</a></li>';
+		$NextGet['P'] = ($PageNum >= $Toall) ? 1 : $_GET['P']+1;
+		$NextUrl = $Url.'?'.http_build_query($NextGet);
+		$NextStr = '<li class="page-item"><a href="' . $NextUrl . '" class="page-link">下一页</a></li>';
+		$Start = $End = 1;
+		$ToallStr = $Str = '';		
+		if ($Toall <= $Num) {
+			$Start = 1;
+			$End = $Toall;
+		} elseif (($Toall - $PageNum) > ceil ( $Num / 2 ) && $PageNum < ceil ( $Num / 2 )) {
+			$Start = 1;
+			$End = $Num;
+		} elseif (($Toall - $PageNum) < ceil ( $Num / 2 )) {
+			$Start = ($Toall - $Num + 1);
+			$End = $Toall;
 		} else {
-			$start = ($pageNum - floor ( $num / 2 ));
-			$end = ($pageNum + floor ( $num / 2 ));
+			$Start = ($PageNum - floor ( $Num / 2 ));
+			$End = ($PageNum + floor ( $Num / 2 ));
 		}
-		for($i = $start; $i <= $end; $i ++) {
-			$str .= ($pageNum == $i) ? '<li class="page-item active"><a class="page-link">' . $i . '</a></li>' : '<li class="page-item"><a href="' . str_replace ( '{page}', $i, $url ) . '" class="page-link">' . $i . '</a></li>';
+		for($i = $Start; $i <= $End; $i ++) {
+			$Str .= ($PageNum == $i) ? '<li class="page-item active"><a class="page-link">' . $i . '</a></li>' : '<li class="page-item"><a href="' . $Url.'?'.http_build_query($_GET). '" class="page-link">' . $i . '</a></li>';
 		}
-		return '<ul class="pagination justify-content-center">' . $pre . $str . $next . $toallStr . '</ul>';
+		return '<ul class="pagination justify-content-center">' . $PreStr . $Str . $NextStr . $ToallStr . '</ul>';
 	}
+	
 	public static function insert_func_array(array $controllerArr) { // -- Name : 回调函数 --
 		$fun_arr = isset ( $controllerArr ['funArr'] ) ? $controllerArr ['funArr'] : array ();
 		$clss = new $controllerArr ['name'] ();
