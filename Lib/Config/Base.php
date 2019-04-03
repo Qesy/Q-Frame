@@ -55,7 +55,7 @@ abstract class Base {
 		if ($Count <= 0) return '';
 		$Toall = ceil ( $Count / $Size );
 		($PageNum <= $Toall) || $PageNum = $Toall;
-		$PreGet = $NextGet = $_GET;
+		$PreGet = $NextGet = $PageListGet = $_GET;
 		$PreGet['P'] = ($PageNum <= 1) ? 1 : $_GET['P']-1;
 		$PreUrl = $Url.'?'.http_build_query($PreGet);
 		$PreStr = '<li class="page-item"><a href="' . $PreUrl . '" class="page-link">上一页</a></li>';
@@ -78,7 +78,8 @@ abstract class Base {
 			$End = ($PageNum + floor ( $Num / 2 ));
 		}
 		for($i = $Start; $i <= $End; $i ++) {
-			$Str .= ($PageNum == $i) ? '<li class="page-item active"><a class="page-link">' . $i . '</a></li>' : '<li class="page-item"><a href="' . $Url.'?'.http_build_query($_GET). '" class="page-link">' . $i . '</a></li>';
+		    $PageListGet['P'] = $i;
+			$Str .= ($PageNum == $i) ? '<li class="page-item active"><a class="page-link">' . $i . '</a></li>' : '<li class="page-item"><a href="' . $Url.'?'.http_build_query($PageListGet). '" class="page-link">' . $i . '</a></li>';
 		}
 		return '<ul class="pagination justify-content-center">' . $PreStr . $Str . $NextStr . $ToallStr . '</ul>';
 	}

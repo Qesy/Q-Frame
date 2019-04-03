@@ -17,6 +17,8 @@ class Build {
 	public $Html;
 	public $Js;
 	public $Module = 'admin';
+	public $IsEdit = true;
+	public $IsDel = true;
 	public $UploadUrl;
 	public static function get_instance() {
 		if (! isset ( self::$s_instance )) {
@@ -206,12 +208,12 @@ class Build {
 	/*
 	 *  $keyArr = array('name' => ''标题'');
 	 */
-	public function Table(array $arr, $keyArr, $Page = '', $IsEdit = true, $IsDel = true){
+	public function Table(array $arr, $keyArr, $Page = ''){
 	    $str = '<table class="table"><thead><tr>';
 	    foreach($keyArr as $k => $v){
 	        $str .= '<th  scope="col">'.$v['Name'].'</th>';
 	    }
-	    if($IsEdit || $IsDel){
+	    if($this->IsEdit || $this->IsDel){
 	        $str .= '<th  scope="col">操作</th>';
 	    }
 	    $str .= '</tr></thead><tbody>';
@@ -232,19 +234,18 @@ class Build {
                         break;
 	                default:
 	                    $str .= '<td>'.$v[$sk].'</td>';break;
-	            }
-	            
+	            }	            
 	        }
-	        if($IsEdit || $IsDel){
+	        if($this->IsEdit || $this->IsDel){
 	            $ActArr = array();
-	            if($IsEdit) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
-	            if($IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?Id='.$v['Id'].'" onclick="return confirm(\'是否删除?\')">删除</a>';
+	            if($this->IsEdit) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
+	            if($this->IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?Id='.$v['Id'].'" onclick="return confirm(\'是否删除?\')">删除</a>';
 	            $str .= '<td>'.implode(' ', $ActArr).'</td>';
 	        }
 	        $str .= '</tr>';
 	    }
 	    $num = count($keyArr);
-	    if($IsEdit || $IsDel) $num++;
+	    if($this->IsEdit || $this->IsDel) $num++;
 	    if(!empty($Page)){
 	       $str .= '</tbody><tfoot><tr><td colspan="'.$num.'" class="page">'.$Page.'</td></tr></tfoot>';
 	    }
