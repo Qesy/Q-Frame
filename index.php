@@ -21,6 +21,7 @@ define ( 'URL_IMG', URL_ROOT . 'Static/images/' );
 define ( 'URL_JS', URL_ROOT . 'Static/scripts/' );
 define ( 'URL_CSS', URL_ROOT . 'Static/styles/' );
 define ( 'URL_BOOT', URL_ROOT.'Static/bootstrap/');
+define( 'URL_DOMAIN', $_SERVER['HTTP_HOST']);
 define ( 'EXTEND', '.php' );
 require PATH_LIB . 'X' . EXTEND;  
 ?>

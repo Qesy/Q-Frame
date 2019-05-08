@@ -28,6 +28,35 @@ abstract class Base {
 	public function createSn() { // -- Name : 生成编号 --
 		return WEB_PREFIX . '-' . uniqid ( rand ( 100, 999 ), false );
 	}
+	
+	public function ApiErr($Code, $Msg = '参数错误'){
+	    $this->Ret['Code'] = $Code;
+	    $this->Ret['Msg'] = $Msg;
+	    die(json_encode($this->Ret));
+	}
+	
+	public function ApiSuccess($Data){
+	    $this->Ret['Data'] = $Data;
+	    die(json_encode($this->Ret));
+	}
+	public function  AZ26($n) { //导出excel有用
+	    $letter = range('A', 'Z', 1);
+	    $s = '';
+	    while ($n > 0) {
+	        $m = $n % 26;
+	        if ($m == 0)
+	            $m = 26;
+	        $s = $letter[$m - 1] . $s;
+	        $n = ($n - $m) / 26;
+	    }
+	    return $s;
+	}
+	
+	public function getRefer(){ //获取上一页
+	    return $_SERVER['HTTP_REFERER'];
+	}
+	
+	
 	public function loadView($temp, $data = array()) { // -- Name : 加载模版 --
 		if (! is_file ( PATH_SYS . 'View/' . $temp . EXTEND ))
 			die ( PATH_SYS . 'View/' . $temp . EXTEND . ' not found !' );
