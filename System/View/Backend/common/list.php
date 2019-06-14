@@ -16,8 +16,9 @@
     <div class="card">
       <div class="card-header">
         <? 
-        if($this->IsAdd):?>
-        <span class="float-right"><a href="<?=empty($AddUrl) ? url(array($this->BuildObj->Module, \Router::$s_controller, 'add')) : $AddUrl?>" class="btn btn-primary btn-sm">添加</a></span>
+        if($this->BuildObj->IsAdd):        
+        ?>
+        <span class="float-right"><a href="<?=empty($AddUrl) ? url(array($this->BuildObj->Module, \Router::$s_controller, 'add')).'?'.http_build_query($_GET) : $AddUrl?>" class="btn btn-primary btn-sm">添加</a></span>
       <? endif ?>
         <h5><?=$Title?></h5>
       </div>

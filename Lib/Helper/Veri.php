@@ -36,4 +36,9 @@ class Veri {
 		}
 		return true;
 	}
+	
+	public function VeriMobile($Mobile){ //验证手机号码
+	    if(strlen($Mobile) != 11 || is_numeric($Mobile) === false || substr($Mobile,0,1) != '1') return false;
+	    return true;
+	}
 }

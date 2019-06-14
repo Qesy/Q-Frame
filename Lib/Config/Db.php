@@ -11,8 +11,7 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  *
  */
 abstract class Db {
-	protected static $p_db_obj;
-	protected $p_dbName;
+	public static $s_db_obj;
 	protected $p_dbConfig;
 	public $sqlSetArr = array (
 			'Cond' => array (),
@@ -29,33 +28,32 @@ abstract class Db {
 	/*
 	 * Name : 构造函数
 	 */
-	public function __construct($dbname = 0) {
-		$this->p_dbName = $dbname;
-		$this->p_dbConfig = db_config ( $this->p_dbName );
+	public function __construct() {
+		$this->p_dbConfig = db_config ();
 		self::_get_db_config ();
 	}
 	/*
 	 * Name : 析构函数
 	 */
 	public function __destruct() {
-		self::$p_db_obj = null;
+		self::$s_db_obj = null;
 	}
 	/*
 	 * Name : 获取配置
 	 */
 	private function _get_db_config() {
-		if (isset ( self::$p_db_obj [$this->p_dbName] )) {
-			return self::$p_db_obj [$this->p_dbName];
+		if (isset ( self::$s_db_obj )) {
+			return self::$s_db_obj;
 		}
 		try {
-			self::$p_db_obj [$this->p_dbName] = new PDO ( 'mysql:dbname=' . $this->p_dbConfig ['Name'] . ';host=' . $this->p_dbConfig ['Host'] . '', $this->p_dbConfig ['Accounts'], $this->p_dbConfig ['Password'], array (
+			self::$s_db_obj  = new PDO ( 'mysql:dbname=' . $this->p_dbConfig ['Name'] . ';host=' . $this->p_dbConfig ['Host'] . '', $this->p_dbConfig ['Accounts'], $this->p_dbConfig ['Password'], array (
 					PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
 			) );
 		} catch ( PDOException $e ) {
 			echo 'Connection failed: ' . $e->getMessage ();
 			exit ();
 		}
-		self::$p_db_obj [$this->p_dbName]->exec ( "SET NAMES " . $this->p_dbConfig ['Charset'] );
+		self::$s_db_obj ->exec ( "SET NAMES " . $this->p_dbConfig ['Charset'] );
 	}
 	
 	/*
@@ -63,7 +61,7 @@ abstract class Db {
 	 */
 	public function query($sql, $fetch_mode = 0) {
 		self::_clean ();
-		$result = self::$p_db_obj [$this->p_dbName]->query ( $sql );
+		$result = self::$s_db_obj ->query ( $sql );
 		if ($result) {
 			if (empty ( $fetch_mode )) {
 				$rs = $result->fetchAll ( PDO::FETCH_ASSOC );
@@ -79,14 +77,14 @@ abstract class Db {
 	 * Name : 获取插入ID
 	 */
 	public function last_insert_id() {
-		return self::$p_db_obj [$this->p_dbName]->lastInsertId ();
+		return self::$s_db_obj->lastInsertId ();
 	}
 	/*
 	 * Name : 执行
 	 */
 	public function exec($sql) {
 		self::_clean ();
-		return self::$p_db_obj [$this->p_dbName]->exec ( $sql );
+		return self::$s_db_obj ->exec ( $sql );
 	}
 	/*
 	 * Name : 插入帮助

@@ -13,15 +13,13 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  */
 function db_config($key) {
 	$dbConfArr = array (
-			array (
-					'Host' => '127.0.0.1',  
-					'Accounts' => 'root',
-					'Password' => 'root',
-					'Name' => 'weishop',
-					'Port' => '3306',
-					'Prefix' => 'ws_',
-					'Charset' => 'utf8' 
-			)
+			'Host' => '127.0.0.1',  
+			'Accounts' => 'root',
+			'Password' => 'root',
+			'Name' => 'weishop',
+			'Port' => '3306',
+			'Prefix' => 'ws_',
+			'Charset' => 'utf8' 
 	);
 	isset ( $dbConfArr [$key] ) || die ( 'No Db Config .' );
 	return $dbConfArr [$key];

@@ -17,9 +17,12 @@ class Build {
 	public $Html;
 	public $Js;
 	public $Module = 'admin';
+	public $PrimaryKey = 'Id';
+	public $IsAdd = true;
 	public $IsEdit = true;
 	public $IsDel = true;
 	public $UploadUrl;
+	public $UploadEditUrl;
 	public static function get_instance() {
 		if (! isset ( self::$s_instance )) {
 			self::$s_instance = new self ();
@@ -29,6 +32,7 @@ class Build {
 	
 	function __construct(){
 	    $this->UploadUrl = url(array('backend', 'index', 'ajaxUpload'));
+	    $this->UploadEditUrl = url(array('backend', 'index', 'uploadEditor'));
 	}
 	
 	/*
@@ -56,13 +60,14 @@ class Build {
                     $this->Html .= '</div>';
                     break;
                     case 'checkbox':
-                        $this->Html = '<div class="checkbox"><span style="font-weight: 700; margin-right: 20px">'.$v['Desc'].'</span>';
-                        $dataArr = explode('|', $v['Data']);
-                        foreach($dataArr as $sk => $sv){
-                            $kv = explode(':', $sv);
-                            $this->Html .= '<label class="checkbox-inline "><input type="checkbox" name="'.$v['Name'].'[]"  value="'.$kv[0].'"> '.$kv[1].'</label>';
+                        //var_dump($v['Value']);
+                        $this->Html .= '<div class="form-group form-group row"><div class="col-sm-1">'.$v['Desc'].'</div><div class="col-sm-11">';
+                        foreach($v['Data'] as $sk => $sv){
+                            $sName = isset($v['DataKey']) ? $v['DataKey'][$sk] : $sk;
+                            $Checked = ($sv == 1) ? 'checked="checked"' : '';
+                            $this->Html .= '<div class="form-check form-check-inline mr-4"><label class="checkbox-inline "><input type="checkbox" name="'.$v['Name'].'['.$sk.']"  value="1" '.$Checked.' > '.$sName.'</label></div>';
                         }
-                        $this->Html .= '</div>';
+                        $this->Html .= '</div></div>';
                         break;
 	               case 'select':
 	                   $this->Html .= '<div class="form-group"><label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label><select class="form-control" name="'.$v['Name'].'" '.$Disabled.'>.';
@@ -156,7 +161,7 @@ class Build {
         allowFileManager : true,
         themeType : "simple",
         urlType : "absolute",
-        uploadJson : "'.$this->UploadUrl.'",
+        uploadJson : "'.$this->UploadEditUrl.'",
         items : ["source","code","fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline",
 "removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
 "insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
@@ -186,10 +191,22 @@ class Build {
                                         
                                    </div>';
 	                       break;
+	                       case 'date':
+	                           $this->Html .= '<div class="form-group">
+                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
+                                        <input type="date" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
+                                   </div>';
+	                           break;
+	                       case 'password':
+	                           $this->Html .= '<div class="form-group">
+                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
+                                        <input type="password" '.$Disabled.' class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
+                                   </div>';
+	                           break;
 	               default:
 	                   $this->Html .= '<div class="form-group">
                                         <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                        <input type="text" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
+                                        <input type="text" '.$Disabled.' class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
                                    </div>';
 	                   break;
 	           }
@@ -238,9 +255,11 @@ class Build {
 	        }
 	        if($this->IsEdit || $this->IsDel){
 	            $ActArr = array();
-	            if($this->IsEdit) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'edit')).'?Id='.$v['Id'].'">修改</a>';
-	            if($this->IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?Id='.$v['Id'].'" onclick="return confirm(\'是否删除?\')">删除</a>';
+	            $_GET[$this->PrimaryKey] = $v[$this->PrimaryKey];
+	            if($this->IsEdit) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'edit')).'?'.http_build_query($_GET).'">修改</a>';
+	            if($this->IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?'.http_build_query($_GET).'" onclick="return confirm(\'是否删除?\')">删除</a>';
 	            $str .= '<td>'.implode(' ', $ActArr).'</td>';
+	            unset($_GET[$this->PrimaryKey]);
 	        }
 	        $str .= '</tr>';
 	    }

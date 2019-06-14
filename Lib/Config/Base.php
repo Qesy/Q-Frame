@@ -56,6 +56,13 @@ abstract class Base {
 	    return $_SERVER['HTTP_REFERER'];
 	}
 	
+	public function HttpBuildQueryQ($Arr){
+	    $RetArr = array();
+	    foreach($Arr as $k => $v){
+	        $RetArr[] = $k.'='.$v;
+	    }
+	    return implode('&', $RetArr);
+	}
 	
 	public function loadView($temp, $data = array()) { // -- Name : 加载模版 --
 		if (! is_file ( PATH_SYS . 'View/' . $temp . EXTEND ))
