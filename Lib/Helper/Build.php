@@ -21,6 +21,11 @@ class Build {
 	public $IsAdd = true;
 	public $IsEdit = true;
 	public $IsDel = true;
+	public $IsSubmit = true;
+	public $LinkEdit;
+	public $LinkDel;
+	public $NameEdit;
+	public $NameDel;
 	public $UploadUrl;
 	public $UploadEditUrl;
 	public static function get_instance() {
@@ -33,6 +38,8 @@ class Build {
 	function __construct(){
 	    $this->UploadUrl = url(array('backend', 'index', 'ajaxUpload'));
 	    $this->UploadEditUrl = url(array('backend', 'index', 'uploadEditor'));
+	   $this->NameEdit = '修改';
+	   $this->NameDel = '删除';
 	}
 	
 	/*
@@ -49,31 +56,29 @@ class Build {
 	    $this->Html = '<form method="post">';
 	    foreach($this->Arr as $k => $v){
 	        $Disabled = ($v['Disabled'] == 1) ? 'disabled="disabled"' : '';
-	           switch ($v['Type']){
-	               case 'radio':
-	                   $this->Html .= '<div class="checkbox"><span style="font-weight: 700; margin-right: 20px">'.$v['Desc'].'</span>';
-	                   $dataArr = explode('|', $v['Data']);
-	                   foreach($dataArr as $sk => $sv){
-	                       $kv = explode(':', $sv);
-	                       $this->Html .= '<label class="radio-inline "><input type="radio" name="'.$v['Name'].'"  value="'.$kv[0].'"> '.$kv[1].'" </label>';
-	                   }
-                    $this->Html .= '</div>';
+	        $v['Placeholder'] = !isset($v['Placeholder']) ? '请输入'.$v['Desc'] : $v['Placeholder'];
+            switch ($v['Type']){
+                case 'radio':
+                   $this->Html .= '<div class="checkbox"><span style="font-weight: 700; margin-right: 20px">'.$v['Desc'].'</span>';
+                   $dataArr = explode('|', $v['Data']);
+                   foreach($dataArr as $sk => $sv){
+                       $kv = explode(':', $sv);
+                       $this->Html .= '<label class="radio-inline "><input type="radio" name="'.$v['Name'].'"  value="'.$kv[0].'"> '.$kv[1].'" </label>';
+                   }
+                $this->Html .= '</div>';
+                break;
+                case 'checkbox':
+                    $this->Html .= '<div class="form-group form-group row"><div class="col-sm-1">'.$v['Desc'].'</div><div class="col-sm-11">';
+                    foreach($v['Data'] as $sk => $sv){
+                        $sName = isset($v['DataKey']) ? $v['DataKey'][$sk] : $sk;
+                        $Checked = ($sv == 1) ? 'checked="checked"' : '';
+                        $this->Html .= '<div class="form-check form-check-inline mr-4"><label class="checkbox-inline "><input type="checkbox" name="'.$v['Name'].'['.$sk.']"  value="1" '.$Checked.' > '.$sName.'</label></div>';
+                    }
+                    $this->Html .= '</div></div>';
                     break;
-                    case 'checkbox':
-                        //var_dump($v['Value']);
-                        $this->Html .= '<div class="form-group form-group row"><div class="col-sm-1">'.$v['Desc'].'</div><div class="col-sm-11">';
-                        foreach($v['Data'] as $sk => $sv){
-                            $sName = isset($v['DataKey']) ? $v['DataKey'][$sk] : $sk;
-                            $Checked = ($sv == 1) ? 'checked="checked"' : '';
-                            $this->Html .= '<div class="form-check form-check-inline mr-4"><label class="checkbox-inline "><input type="checkbox" name="'.$v['Name'].'['.$sk.']"  value="1" '.$Checked.' > '.$sName.'</label></div>';
-                        }
-                        $this->Html .= '</div></div>';
-                        break;
 	               case 'select':
-	                   $this->Html .= '<div class="form-group"><label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label><select class="form-control" name="'.$v['Name'].'" '.$Disabled.'>.';
-                        //$dataArr = explode('|', $v['Data']);
+	                   $this->Html .= '<div class="form-group"><label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label><select class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" '.$Disabled.'>';
                           foreach($v['Data'] as $sk => $sv){
-                            //$kv = explode(':', $sv);
                             $selected = ($sk == $v['Value']) ? 'selected' : '';
                             $this->Html .= '<option value="'.$sk.'" '.$selected.'>'.$sv.'</option>';
                           }
@@ -111,7 +116,6 @@ class Build {
 	                       ';
 	                   break;
 	               case 'Slide':
-	                   //var_dump($v['Value']);exit;
 	                   foreach($v['Value'] as $sk => $sv){
 	                       $this->Html .= '<div class="form-group">
                                     <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
@@ -146,28 +150,28 @@ class Build {
 	                   break;
 	               case 'textarea':
 	                   $this->Html .= '<div class="form-group">
-                                    <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                    <textarea class="form-control" name="Content" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
-                                  </div>';
+                            <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
+                            <textarea class="form-control" name="'.$v['Name'].'" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
+                       </div>';
 	                   break;
 	                   case 'editor':
 	                       $this->Html .= '<div class="form-group">
                                     <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                    <textarea class="form-control" name="Content" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
+                                    <textarea class="form-control" name="'.$v['Name'].'" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
                                   </div>';
-	                       $this->Js .= 'var editor;
-    KindEditor.ready(function(K) {
-      editor = K.create(\'textarea[name="Content"]\', {
-        allowFileManager : true,
-        themeType : "simple",
-        urlType : "absolute",
-        uploadJson : "'.$this->UploadEditUrl.'",
-        items : ["source","code","fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline",
-"removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
-"insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
-
-      })
-    })';
+        	                       $this->Js .= 'var editor;
+                                    KindEditor.ready(function(K) {
+                                      editor = K.create(\'textarea[name="Content"]\', {
+                                        allowFileManager : true,
+                                        themeType : "simple",
+                                        urlType : "absolute",
+                                        uploadJson : "'.$this->UploadEditUrl.'",
+                                        items : ["source","code","fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline",
+                                "removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
+                                "insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
+                                
+                                      })
+                                    })';
 	                       break;
 	               case 'disabled':
 	                   $this->Html .= '<div class="form-group">
@@ -179,15 +183,15 @@ class Build {
 	                   case 'disabled':
 	                       $this->Html .= '<div class="form-group">
                                         <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                            <div class="input-group mb-3">
-  <div class="input-group-prepend">
-    <span class="input-group-text">&yen;</span>
-  </div>
-  <input type="text" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
-  <div class="input-group-append">
-    <span class="input-group-text">.00</span>
-  </div>
-</div>
+                                         <div class="input-group mb-3">
+                                      <div class="input-group-prepend">
+                                        <span class="input-group-text">&yen;</span>
+                                      </div>
+                                      <input type="text" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
+                                      <div class="input-group-append">
+                                        <span class="input-group-text">.00</span>
+                                      </div>
+                                    </div>
                                         
                                    </div>';
 	                       break;
@@ -211,7 +215,7 @@ class Build {
 	                   break;
 	           }
 	       }
-	       $this->Html .= '<button type="submit" class="btn btn-success">提交</button></form>';
+	       if($this->IsSubmit) $this->Html .= '<button type="submit" class="btn btn-success">提交</button></form>';	       
 	       if(!empty($this->Js)){
 	           $this->Js =  '
 	               var URL_ROOT = "'.URL_ROOT.'";
@@ -226,6 +230,8 @@ class Build {
 	 *  $keyArr = array('name' => ''标题'');
 	 */
 	public function Table(array $arr, $keyArr, $Page = ''){
+	    $this->LinkEdit = !empty($this->LinkEdit) ? $this->LinkEdit : url(array($this->Module, \Router::$s_controller, 'edit'));
+	    $this->LinkDel = !empty($this->LinkDel) ? $this->LinkDel  :  url(array($this->Module, \Router::$s_controller, 'del'));
 	    $str = '<table class="table"><thead><tr>';
 	    foreach($keyArr as $k => $v){
 	        $str .= '<th  scope="col">'.$v['Name'].'</th>';
@@ -256,8 +262,8 @@ class Build {
 	        if($this->IsEdit || $this->IsDel){
 	            $ActArr = array();
 	            $_GET[$this->PrimaryKey] = $v[$this->PrimaryKey];
-	            if($this->IsEdit) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'edit')).'?'.http_build_query($_GET).'">修改</a>';
-	            if($this->IsDel) $ActArr[] = '<a href="'.url(array($this->Module, \Router::$s_controller, 'del')).'?'.http_build_query($_GET).'" onclick="return confirm(\'是否删除?\')">删除</a>';
+	            if($this->IsEdit) $ActArr[] = '<a href="'.$this->LinkEdit.'?'.http_build_query($_GET).'">'.$this->NameEdit.'</a>';
+	            if($this->IsDel) $ActArr[] = '<a href="'.$this->LinkDel.'?'.http_build_query($_GET).'" onclick="return confirm(\'是否删除?\')">'.$this->NameDel.'</a>';
 	            $str .= '<td>'.implode(' ', $ActArr).'</td>';
 	            unset($_GET[$this->PrimaryKey]);
 	        }
