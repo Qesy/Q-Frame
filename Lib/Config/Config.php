@@ -11,8 +11,8 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-function db_config($key) {
-	$dbConfArr = array (
+function db_config() {
+	return array (
 			'Host' => '127.0.0.1',  
 			'Accounts' => 'root',
 			'Password' => 'root',
@@ -21,8 +21,6 @@ function db_config($key) {
 			'Prefix' => 'ws_',
 			'Charset' => 'utf8' 
 	);
-	isset ( $dbConfArr [$key] ) || die ( 'No Db Config .' );
-	return $dbConfArr [$key];
 }
 function site_config() {
 	return array (

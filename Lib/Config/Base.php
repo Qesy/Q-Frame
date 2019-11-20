@@ -1,5 +1,7 @@
 <?php
 use Helper as help;
+use Helper\Code;
+use Helper\Build;
 defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 
 /*
@@ -16,9 +18,26 @@ abstract class Base {
 	public $pageNum = 20;
 	public $temp_arr = array ();
 	public $cookieObj;
+	public $CodeObj;
+	public $BuildObj;
+	public $Ret = array('Code' => 0, 'Data' => array(), 'Msg' => '');
 	function __construct() {
+	    $this->CodeObj = Code::get_instance();
+	    $this->BuildObj = Build::get_instance();
 		$this->cookieObj =  help\Cookie::get_instance();
 	}
+	
+	public function ApiErr($Code, $Msg = '参数错误'){
+	    $this->Ret['Code'] = $Code;
+	    $this->Ret['Msg'] = $Msg;
+	    die(json_encode($this->Ret));
+	}
+	
+	public function ApiSuccess($Data = array()){
+	    $this->Ret['Data'] = $Data;
+	    die(json_encode($this->Ret));
+	}
+	
 	public function veriPara(array $request , array $paraArr){
 	    foreach($paraArr as $v){
 	        if(empty($request[$v])) return false;
@@ -29,16 +48,7 @@ abstract class Base {
 		return WEB_PREFIX . '-' . uniqid ( rand ( 100, 999 ), false );
 	}
 	
-	public function ApiErr($Code, $Msg = '参数错误'){
-	    $this->Ret['Code'] = $Code;
-	    $this->Ret['Msg'] = $Msg;
-	    die(json_encode($this->Ret));
-	}
-	
-	public function ApiSuccess($Data){
-	    $this->Ret['Data'] = $Data;
-	    die(json_encode($this->Ret));
-	}
+
 	public function  AZ26($n) { //导出excel有用
 	    $letter = range('A', 'Z', 1);
 	    $s = '';
@@ -84,20 +94,24 @@ abstract class Base {
 		}
 	}
 	
-    public function page_bar($Count, $Size) { // -- 分页 --
+public function page_bar($Count, $Size) { // -- 分页 --
 	    $Num = 9;
-	    $PageNum = isset($_GET['P']) ? intval($_GET['P']) : 1;	    
+	    $PageNum = !empty($_GET['P']) ? intval($_GET['P']) : 1;	    
 	    $Url = URL_ROOT.URL_CURRENT;
 		if ($Count <= 0) return '';
 		$Toall = ceil ( $Count / $Size );
 		($PageNum <= $Toall) || $PageNum = $Toall;
-		$PreGet = $NextGet = $PageListGet = $_GET;
-		$PreGet['P'] = ($PageNum <= 1) ? 1 : $_GET['P']-1;
+		$JumpGet = $PreGet = $NextGet = $PageListGet = $_GET;
+		$PreGet['P'] = ($PageNum <= 1) ? 1 : $PageNum-1;
 		$PreUrl = $Url.'?'.http_build_query($PreGet);
-		$PreStr = '<li class="page-item"><a href="' . $PreUrl . '" class="page-link">上一页</a></li>';
-		$NextGet['P'] = ($PageNum >= $Toall) ? 1 : $_GET['P']+1;
+		$PreStr = '<li class="page-item '.(($PageNum == 1) ? 'disabled' : '').'"><a href="' . $PreUrl . '" class="page-link">上一页</a></li>';
+		$NextGet['P'] = ($PageNum >= $Toall) ? 1 : $PageNum+1;
 		$NextUrl = $Url.'?'.http_build_query($NextGet);
-		$NextStr = '<li class="page-item"><a href="' . $NextUrl . '" class="page-link">下一页</a></li>';
+		$NextStr = '<li class="page-item '.(($PageNum == $Toall) ? 'disabled' : '').'"><a href="' . $NextUrl . '" class="page-link">下一页</a></li>';
+		$PageListGet['P'] = 1;
+		$FirstPage = '<li class="page-item '.(($PageNum == 1) ? 'disabled' : '').'"><a href="'.$Url.'?'.http_build_query($PageListGet).'" class="page-link">首页</a></li>';
+		$PageListGet['P'] = $Toall;
+		$LastPage = '<li class="page-item '.(($PageNum == $Toall) ? 'disabled' : '').'"><a href="'.$Url.'?'.http_build_query($PageListGet).'" class="page-link">尾页</a></li>';
 		$Start = $End = 1;
 		$ToallStr = $Str = '';		
 		if ($Toall <= $Num) {
@@ -117,7 +131,20 @@ abstract class Base {
 		    $PageListGet['P'] = $i;
 			$Str .= ($PageNum == $i) ? '<li class="page-item active"><a class="page-link">' . $i . '</a></li>' : '<li class="page-item"><a href="' . $Url.'?'.http_build_query($PageListGet). '" class="page-link">' . $i . '</a></li>';
 		}
-		return '<ul class="pagination justify-content-center">' . $PreStr . $Str . $NextStr . $ToallStr . '</ul>';
+		unset($JumpGet['P']);
+		$Jump = "		    
+		    <div class='input-group input-group-sm mb-3 p-1' style='width:80px'>
+                <input type='text' class='form-control'  id='QFramePageNum' value='".$PageNum."'>
+                <div class='input-group-append'>
+                    <button class='btn btn-primary' type='button' onclick='QFramePageJump()'>GO!</button>
+                </div>
+            </div>
+            <script>
+            function QFramePageJump(){
+                window.location.href='{$Url}?".http_build_query($JumpGet)."&P='+document.getElementById('QFramePageNum').value+'';
+            }
+		    </script>";
+		return '<ul class="pagination justify-content-center">'.$FirstPage . $PreStr . $Str . $NextStr . $ToallStr . $LastPage.'<li class="page-item  disabled mr-3"><a  class="page-link">总'.$Count.'条</a></li>'.$Jump.'</ul>';
 	}
 	
 	public static function insert_func_array(array $controllerArr) { // -- Name : 回调函数 --

@@ -22,10 +22,13 @@ class Build {
 	public $IsEdit = true;
 	public $IsDel = true;
 	public $IsSubmit = true;
+	public $LinkIndex;
+	public $LinkExport;
+	public $LinkAdd;
 	public $LinkEdit;
 	public $LinkDel;
-	public $NameEdit;
-	public $NameDel;
+	public $NameEdit = '修改';
+	public $NameDel = '删除';
 	public $UploadUrl;
 	public $UploadEditUrl;
 	public static function get_instance() {
@@ -35,99 +38,204 @@ class Build {
 		return self::$s_instance;
 	}
 	
-	function __construct(){
+/* 	function __construct(){
 	    $this->UploadUrl = url(array('backend', 'index', 'ajaxUpload'));
 	    $this->UploadEditUrl = url(array('backend', 'index', 'uploadEditor'));
-	   $this->NameEdit = '修改';
-	   $this->NameDel = '删除';
+	} */
+	
+	
+	
+	public function Form($Method = 'POST', $Class = ''){
+	    $this->UploadUrl = !empty($this->UploadUrl) ? $this->UploadUrl : url(array('backend', 'index', 'ajaxUpload'));
+	    $this->UploadEditUrl = empty($this->UploadEditUrl) ? $this->UploadEditUrl : url(array('backend', 'index', 'uploadEditor'));
+	    if(!is_array($this->Arr)) return;
+	    $this->LinkIndex = !empty($this->LinkIndex) ? $this->LinkIndex : url(array($this->Module, \Router::$s_controller, 'index'));
+	    $this->LinkExport = !empty($this->LinkExport) ? $this->LinkExport : url(array($this->Module, \Router::$s_controller, 'export'));
+	    self::_Clean();
+	    $this->Html = '<form method="'.$Method.'" class="BuildForm '.$Class.'">';
+	    foreach($this->Arr as $k => $v){
+	           if(empty($v['Col']) && $Class != 'form-inline') $v['Col'] = 12;
+	           switch ($v['Type']){
+	               case 'formgroup':
+	                   $this->Html .= self::_FromGroup($v['Col'], $v['Desc']); break;
+	               case 'radio':
+	                   $this->Html .= self::_FormRadio($v['Name'], $v['Desc'], $v['Value'], $v['Data'], $v['Col'], $v['Disabled']); break;
+                    case 'checkbox':
+                        $this->Html .= self::_FormCheckbox($v['Name'], $v['Desc'], $v['Value'], $v['Data'], $v['Col'], $v['Disabled']); break;
+	               case 'select':
+	                   $this->Html .= self::_FromSelect($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Disabled']); break;
+	               case 'upload':
+	                   list($StrHtml, $StrJs) = self::_FormUpload($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); 
+	                   $this->Html .= $StrHtml;
+	                   $this->Js .= $StrJs;
+	                   break;
+	               case 'slide':
+	                   list($StrHtml, $StrJs) = self::_FormSlide($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); 
+	                   $this->Html .= $StrHtml;
+	                   $this->Js .= $StrJs;
+	                   break;
+	               case 'textarea':
+	                   $this->Html .= self::_FormTextarea($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); break;
+                   case 'editor':
+                       list($StrHtml, $StrJs) = self::_FormEditor($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); 
+                       $this->Html .= $StrHtml;
+                       $this->Js .= $StrJs;
+                       break;
+	               case 'money':
+	                       $this->Html .= self::_FromMoney($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); break;	                       
+                   case 'date':
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'date', $v['Disabled'], $v['Placeholder']); break;
+                   case 'password':
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'password', $v['Disabled'], $v['Placeholder']); break;
+                   case 'button':
+                       if(empty($v['ButtonType'])) $v['ButtonType'] = 'submit';
+                       if(empty($v['Class'])) $v['Class'] = 'primary';
+                       $this->Html .= self::_FromButton($v['Name'], $v['Desc'], $v['ButtonType'], $v['Col'], $v['Class']);break;
+                   case 'link':
+                       if(empty($v['Class'])) $v['Class'] = 'primary';
+                       $this->Html .= self::_FromLink($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+                   case 'html':
+                       if(empty($v['Class'])) $v['Class'] = 'primary';
+                       $this->Html .= self::_html($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+                   case 'hidden':
+                       if(empty($v['Class'])) $v['Class'] = 'primary';
+                       $this->Html .= self::_Hidden($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+	               default:
+	                   $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'text', $v['Disabled'], $v['Placeholder']); break;
+	           }
+	       }
+	       if($Class != 'form-inline') $Col = 12;
+	       if($this->IsSubmit) $this->Html .= self::_FromButton('submit', '提交', $Col, 'primary');
+
+	       $this->Html .= '</form>';
+	       if(!empty($this->Js)){
+	           $this->Js =  '
+	               var URL_ROOT = "'.URL_ROOT.'";
+                   var UploadBtn = {}, interval;'.$this->Js;
+	       }
+	       $this->Arr = array();
 	}
 	
-	/*
-	 * arr = array(
-	 *     array('Name' =>'Name', 'Desc' => '用户名',  'Type' => 'input', 'Value' =>'Qesy', 'Placeholder' => '你网站的名称'),
-	 *     array('Name' =>'Name', 'Desc' => '请选择用户', 'Type' => 'select', 'Value' =>'Qesy', 'Data' => 'a:1|b:2|c:3'),
-	 *     array('Name' =>'Name', 'Desc' => '请选择用户', 'Type' => 'checkbox', 'Value' =>'Qesy', 'Data' => 'a:1|b:2|c:3'),
-	 *     array('Name' =>'Name', 'Desc' => '请选择用户', 'Type' => 'upload', 'Value' =>'Qesy', 'Id' => 'Img'),
-	 * );
-	 */
-	function Form(){
-	    if(!is_array($this->Arr)) return;
-	    self::_Clean();
-	    $this->Html = '<form method="post">';
-	    foreach($this->Arr as $k => $v){
-	        $Disabled = ($v['Disabled'] == 1) ? 'disabled="disabled"' : '';
-	        $v['Placeholder'] = !isset($v['Placeholder']) ? '请输入'.$v['Desc'] : $v['Placeholder'];
-            switch ($v['Type']){
-                case 'radio':
-                   $this->Html .= '<div class="checkbox"><span style="font-weight: 700; margin-right: 20px">'.$v['Desc'].'</span>';
-                   $dataArr = explode('|', $v['Data']);
-                   foreach($dataArr as $sk => $sv){
-                       $kv = explode(':', $sv);
-                       $this->Html .= '<label class="radio-inline "><input type="radio" name="'.$v['Name'].'"  value="'.$kv[0].'"> '.$kv[1].'" </label>';
-                   }
-                $this->Html .= '</div>';
-                break;
-                case 'checkbox':
-                    $this->Html .= '<div class="form-group form-group row"><div class="col-sm-1">'.$v['Desc'].'</div><div class="col-sm-11">';
-                    foreach($v['Data'] as $sk => $sv){
-                        $sName = isset($v['DataKey']) ? $v['DataKey'][$sk] : $sk;
-                        $Checked = ($sv == 1) ? 'checked="checked"' : '';
-                        $this->Html .= '<div class="form-check form-check-inline mr-4"><label class="checkbox-inline "><input type="checkbox" name="'.$v['Name'].'['.$sk.']"  value="1" '.$Checked.' > '.$sName.'</label></div>';
-                    }
-                    $this->Html .= '</div></div>';
-                    break;
-	               case 'select':
-	                   $this->Html .= '<div class="form-group"><label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label><select class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" '.$Disabled.'>';
-                          foreach($v['Data'] as $sk => $sv){
-                            $selected = ($sk == $v['Value']) ? 'selected' : '';
-                            $this->Html .= '<option value="'.$sk.'" '.$selected.'>'.$sv.'</option>';
-                          }
-                        $this->Html .= '</select></div>';
-	                   break;
-	               case 'upload':
-	                   $this->Html .= '<div class="form-group">
-                                    <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
+	public function FormOne($v){
+	    $Html = $Js = '';
+	    switch ($v['Type']){
+	        case 'formgroup':
+	            $Html = self::_FromGroup($v['Col'], $v['Desc']); break;
+	        case 'radio':
+	            $Html = self::_FormRadio($v['Name'], $v['Desc'], $v['Value'], $v['Data'], $v['Col'], $v['Disabled']); break;
+	        case 'checkbox':
+	            $Html = self::_FormCheckbox($v['Name'], $v['Desc'], $v['Value'], $v['Data'], $v['Col'], $v['Disabled']); break;
+	        case 'select':
+	            $Html = self::_FromSelect($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Disabled']); break;
+	        case 'upload':
+	            list($StrHtml, $StrJs) = self::_FormUpload($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']);
+	            $Html = $StrHtml;
+	            $Js = $StrJs;
+	            break;
+	        case 'slide':
+	            list($StrHtml, $StrJs) = self::_FormSlide($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']);
+	            $Html = $StrHtml;
+	            $Js = $StrJs;
+	            break;
+	        case 'textarea':
+	            $Html = self::_FormTextarea($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); break;
+	        case 'editor':
+	            list($StrHtml, $StrJs) = self::_FormEditor($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']);
+	            $Html = $StrHtml;
+	            $Js = $StrJs;
+	            break;
+	        case 'money':
+	            $Html = self::_FromMoney($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); break;
+	        case 'date':
+	            $Html = self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'date', $v['Disabled'], $v['Placeholder']); break;
+	        case 'password':
+	            $Html = self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'password', $v['Disabled'], $v['Placeholder']); break;
+	        case 'button':
+	            if(empty($v['ButtonType'])) $v['ButtonType'] = 'submit';
+	            if(empty($v['Class'])) $v['Class'] = 'primary';
+	            $Html = self::_FromButton($v['Name'], $v['Desc'], $v['ButtonType'], $v['Col'], $v['Class']);break;
+	        case 'link':
+	            if(empty($v['Class'])) $v['Class'] = 'primary';
+	            $Html = self::_FromLink($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+	        case 'html':
+	            if(empty($v['Class'])) $v['Class'] = 'primary';
+	            $Html = self::_html($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+	        case 'hidden':
+	            if(empty($v['Class'])) $v['Class'] = 'primary';
+	            $Html = self::_Hidden($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+	        default:
+	            $Html= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'text', $v['Disabled'], $v['Placeholder']); break;
+	    }
+	    return array('Html' => $Html, 'Js' => $Js);
+	}
+	
+	private function _FromLink($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2'){ //链接
+	    return '<div class="form-group col-'.$Col.'"><a href="'.$Value.'" class="btn '.$Class.'" target="'.$Data.'">'.$Desc.'</a></a></div>';
+	}
+	
+	private function _Html($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2'){
+	    return '<div class="form-group col-'.$Col.' " ><label for="Input_'.$Name.'">'.$Desc.'</label><div class="">'.$Value.'</div></div>';
+	}
+	
+	private function _Hidden($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2'){
+	    return '<div class="form-group col-'.$Col.' d-none">
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>
+                        <input type="hidden" class="form-control" name="'.$Name.'" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'">
+                    </div>';
+	}
+	
+	private function _FromButton($Name, $Desc, $Type, $Col = 12, $Class = 'primary'){ //Button
+	    return '<div class="form-group col-'.$Col.'"><button type="'.$Type.'" class="btn btn-'.$Class.'" id="Button_'.$Name.'">'.$Desc.'</button></div>';
+	}
+	
+	private function _FormRadio($Name, $Desc, $Value, $DataArr = array(),  $Col, $IsDisabled = 0){
+	    $Str = '<div class="form-group col-'.$Col.'""><label  class="mr-3">'.$Desc.'</label>';
+	    foreach($DataArr as $k => $v){
+	        $Checked = ($Value == $k) ? 'checked="checked"' : '';
+	        $Str .= '<label class="radio-inline mr-3"><input type="radio" name="'.$Name.'"  value="'.$k.'" '.$Checked.'> '.$v.'</label>';
+	    }
+	    $Str .= '</div>';
+	    return $Str;
+	}
+	
+	private function _FormCheckbox($Name, $Desc, $Value, $DataArr = array(),  $Col, $IsDisabled = 0){ //Checkbox
+	    $ValueArr = explode('|', $Value);
+	    $Str = '<div class="form-group col-'.$Col.'""><label  class="mr-3">'.$Desc.'</label>';
+	    foreach($DataArr as $k => $v){
+	        $Checked = in_array($k, $ValueArr) ? 'checked="checked"' : '';
+	        $Str .= '<div class="form-check form-check-inline mr-3"><label class="checkbox-inline "><input type="checkbox" name="'.$Name.'['.$k.']"  value="1" '.$Checked.' > '.$v.'</label></div>';
+	    }
+	    $Str .= '</div>';
+	    return $Str;
+	}
+	
+	private function _FromSelect($Name, $Desc, $Value, $Col, $DataArr = array(),  $IsDisabled = 0){ //select
+	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    $Str = '<div class="form-group col-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label><select class="form-control" name="'.$Name.'" id="Input_'.$Name.'" '.$Disabled.'>';
+	    foreach($DataArr as $sk => $sv){
+	        $selected = ($sk == $Value) ? 'selected' : '';
+	        $Str .= '<option value="'.$sk.'" '.$selected.'>'.$sv.'</option>';
+	    }
+	    $Str .= '</select></div>';
+	    return $Str;
+	}
+	
+	private function _FormUpload($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){
+	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    $StrHtml = $StrJs = '';
+	    $StrHtml .= '<div class="form-group col-'.$Col.'">
+                                    <label for="Input_'.$Name.'">'.$Desc.'</label>
                                     <div class="input-group">
-                                      <input type="text" class="form-control" placeholder="'.$v['Placeholder'].'" name="'.$v['Name'].'" Id="Img_'.$v['Name'].'" value="'.$v['Value'].'">
-                                      <span class="input-group-btn">
-                                        <button class="btn btn-success" id="uploadImg_'.$v['Name'].'" type="button">上传图片</button>
+                                      <input type="text" class="form-control" '.$IsDisabled.' placeholder="'.$Placeholder.'" name="'.$Name.'" Id="Img_'.$Name.'" value="'.$Value.'">
+                                      <span class="input-group-append">
+                                        <button class="btn btn-success" id="uploadImg_'.$Name.'" type="button">上传图片</button>
                                       </span>
                                     </div>
                                   </div> ';
-	                   $this->Js .= 'UploadBtn["'.$v['Name'].'"] = $("#uploadImg_'.$v['Name'].'");      
-                            new AjaxUpload(UploadBtn["'.$v['Name'].'"], {
-                              action: "'.$this->UploadUrl.'", 
-                              name: "filedata",
-                              onSubmit : function(file, ext){
-                                this.disable();     
-                              },      
-                              onComplete: function(file, response){ 
-                                var jsonArr = JSON.parse(response);
-                                console.log(jsonArr.code)
-                                if(jsonArr.code != 0){
-                                  this.enable();
-                                  alert(jsonArr.msg);return;
-                                }
-                                window.clearInterval(interval);
-                                this.enable();      
-                                $("#Img_'.$v['Name'].'").val(jsonArr.data.url)
-                              }
-                          });
-	                       ';
-	                   break;
-	               case 'Slide':
-	                   foreach($v['Value'] as $sk => $sv){
-	                       $this->Html .= '<div class="form-group">
-                                    <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                    <div class="input-group">
-                                      <input type="text" class="form-control" placeholder="'.$v['Placeholder'].'" name="'.$v['Name'].'[]" Id="Img_'.$v['Name'].'_'.$sk.'" value="'.$sv.'">
-                                      <span class="input-group-btn">
-                                        <button class="btn btn-success" id="uploadImg_'.$v['Name'].'_'.$sk.'" type="button">上传图片</button>
-                                      </span>
-                                    </div>
-                                  </div> ';
-	                       $this->Js .= 'UploadBtn["'.$v['Name'].'_'.$sk.'"] = $("#uploadImg_'.$v['Name'].'_'.$sk.'");
-                            new AjaxUpload(UploadBtn["'.$v['Name'].'_'.$sk.'"], {
+	    $StrJs .= 'UploadBtn["'.$Name.'"] = $("#uploadImg_'.$Name.'");
+                            new AjaxUpload(UploadBtn["'.$Name.'"], {
                               action: "'.$this->UploadUrl.'",
                               name: "filedata",
                               onSubmit : function(file, ext){
@@ -142,103 +250,121 @@ class Build {
                                 }
                                 window.clearInterval(interval);
                                 this.enable();
-                                $("#Img_'.$v['Name'].'_'.$sk.'").val(jsonArr.data.url)
+                                $("#Img_'.$Name.'").val(jsonArr.data.url)
                               }
                           });
 	                       ';
-	                   }
-	                   break;
-	               case 'textarea':
-	                   $this->Html .= '<div class="form-group">
-                            <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                            <textarea class="form-control" name="'.$v['Name'].'" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
-                       </div>';
-	                   break;
-	                   case 'editor':
-	                       $this->Html .= '<div class="form-group">
-                                    <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                    <textarea class="form-control" name="'.$v['Name'].'" rows="16" placeholder="'.$v['Placeholder'].'">'.$v['Value'].'</textarea>
-                                  </div>';
-        	                       $this->Js .= 'var editor;
-                                    KindEditor.ready(function(K) {
-                                      editor = K.create(\'textarea[name="Content"]\', {
-                                        allowFileManager : true,
-                                        themeType : "simple",
-                                        urlType : "absolute",
-                                        uploadJson : "'.$this->UploadEditUrl.'",
-                                        items : ["source","code","fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline",
-                                "removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
-                                "insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
-                                
-                                      })
-                                    })';
-	                       break;
-	               case 'disabled':
-	                   $this->Html .= '<div class="form-group">
-                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                        <input disabled="disabled" type="text" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
-                                   </div>';
-	                   break;
-	               case 'money':
-	                   case 'disabled':
-	                       $this->Html .= '<div class="form-group">
-                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                         <div class="input-group mb-3">
-                                      <div class="input-group-prepend">
-                                        <span class="input-group-text">&yen;</span>
-                                      </div>
-                                      <input type="text" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
-                                      <div class="input-group-append">
-                                        <span class="input-group-text">.00</span>
-                                      </div>
-                                    </div>
-                                        
-                                   </div>';
-	                       break;
-	                       case 'date':
-	                           $this->Html .= '<div class="form-group">
-                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                        <input type="date" class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
-                                   </div>';
-	                           break;
-	                       case 'password':
-	                           $this->Html .= '<div class="form-group">
-                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                        <input type="password" '.$Disabled.' class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
-                                   </div>';
-	                           break;
-	               default:
-	                   $this->Html .= '<div class="form-group">
-                                        <label for="Input_'.$v['Name'].'">'.$v['Desc'].'</label>
-                                        <input type="text" '.$Disabled.' class="form-control" name="'.$v['Name'].'" id="Input_'.$v['Name'].'" placeholder="'.$v['Placeholder'].'" value="'.$v['Value'].'">
-                                   </div>';
-	                   break;
-	           }
-	       }
-	       if($this->IsSubmit) $this->Html .= '<button type="submit" class="btn btn-success">提交</button></form>';	       
-	       if(!empty($this->Js)){
-	           $this->Js =  '
-	               var URL_ROOT = "'.URL_ROOT.'";
-                   var UploadBtn = {}, interval;'.$this->Js;
-	       }
-	       $this->Arr = array();
+	    return array($StrHtml, $StrJs);
 	}
 	
+	
+	private function _FormSlide($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //多图
+	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    $StrHtml = '<div class="col-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label>';
+	    $StrJs = '';
+	    $ValueArr = explode('|', $Value);
+	    foreach($ValueArr as $sk => $sv){
+               $StrHtml .= '<div class="form-group">                            
+                            <div class="input-group">
+                                <input type="text" class="form-control" '.$IsDisabled.' placeholder="'.$Placeholder.'" name="'.$Name.'[]" Id="Img_'.$Name.'_'.$sk.'" value="'.$sv.'">
+                                <span class="input-group-btn"><button class="btn btn-success" id="uploadImg_'.$Name.'_'.$sk.'" type="button">上传图片</button></span>
+                            </div>
+                        </div> ';
+               $StrJs .= 'UploadBtn["'.$Name.'_'.$sk.'"] = $("#uploadImg_'.$Name.'_'.$sk.'");
+                new AjaxUpload(UploadBtn["'.$Name.'_'.$sk.'"], {
+                      action: "'.$this->UploadUrl.'",
+                      name: "filedata",
+                      onSubmit : function(file, ext){
+                        this.disable();
+                      },
+                      onComplete: function(file, response){
+                        var jsonArr = JSON.parse(response);
+                        console.log(jsonArr.code)
+                        if(jsonArr.code != 0){
+                          this.enable();
+                          alert(jsonArr.msg);return;
+                        }
+                        window.clearInterval(interval);
+                        this.enable();
+                        $("#Img_'.$Name.'_'.$sk.'").val(jsonArr.data.url)
+                      }
+              });';
+        }
+        $StrHtml .= '</div>';
+        return array($StrHtml, $StrJs);
+	}
+	
+	private function _FormEditor($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //编辑器
+	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    $StrHtml = '<div class="form-group col-'.$Col.'">
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>
+                        <textarea class="form-control" name="'.$Name.'" '.$IsDisabled.' rows="16" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
+                    </div>';
+        $StrJs = 'var editor;
+            KindEditor.ready(function(K) {
+                editor = K.create(\'textarea[name="'.$Name.'"]\', {
+                    allowFileManager : true,
+                    themeType : "simple",
+                    urlType : "absolute",
+                    uploadJson : "'.$this->UploadEditUrl.'",
+                    items : ["source","code","fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline",
+                    "removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
+                    "insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
+                  })
+            })';
+        return array($StrHtml, $StrJs);
+	}
+	
+	private function _FromMoney($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //金钱
+	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    return '<div class="form-group col-'.$Col.'">
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend"><span class="input-group-text">&yen;</span></div>
+                                <input type="text" class="form-control" name="'.$Name.'" '.$IsDisabled.' id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'">
+                                <div class="input-group-append"><span class="input-group-text">.00</span></div>
+                            </div>
+                    </div>';
+	}
+	
+	private function _FromInput($Name, $Desc, $Value, $Col, $Type = 'text', $IsDisabled = 0, $Placeholder = ''){ //输入框
+	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
+	    return '<div class="form-group col-'.$Col.'">
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>
+                        <input type="'.$Type.'" '.$Disabled.' class="form-control" name="'.$Name.'" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'">
+                    </div>';
+	}
+	
+	private function _FromGroup($Col, $Desc){ //填充而已
+	    return '<div class="form-group col-'.$Col.'">'.$Desc.' 
+                    </div>';
+	}
+	
+	private function _FormTextarea($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //输入框
+	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    return '<div class="form-group col-'.$Col.'">
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>
+                        <textarea class="form-control" name="'.$Name.'" '.$Disabled.' rows="3" id="Input_'.$Name.'" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
+                      </div>';
+	}
 
 	
 	/*
 	 *  $keyArr = array('name' => ''标题'');
 	 */
 	public function Table(array $arr, $keyArr, $Page = ''){
-	    $this->LinkEdit = !empty($this->LinkEdit) ? $this->LinkEdit : url(array($this->Module, \Router::$s_controller, 'edit'));
-	    $this->LinkDel = !empty($this->LinkDel) ? $this->LinkDel  :  url(array($this->Module, \Router::$s_controller, 'del'));
+	    $num = count($keyArr);
+	    if(empty($this->LinkAdd)) $this->LinkAdd = url(array($this->Module, \Router::$s_controller, 'add'));
+	    if(empty($this->LinkEdit)) $this->LinkEdit = url(array($this->Module, \Router::$s_controller, 'edit'));
+	    if(empty($this->LinkDel)) $this->LinkDel = url(array($this->Module, \Router::$s_controller, 'del'));
 	    $str = '<table class="table"><thead><tr>';
-	    foreach($keyArr as $k => $v){
-	        $str .= '<th  scope="col">'.$v['Name'].'</th>';
-	    }
-	    if($this->IsEdit || $this->IsDel){
-	        $str .= '<th  scope="col">操作</th>';
-	    }
+	    foreach($keyArr as $k => $v) $str .= '<th  scope="col">'.$v['Name'].'</th>';
+	    if($this->IsEdit || $this->IsDel) $str .= '<th  scope="col">操作</th>';
 	    $str .= '</tr></thead><tbody>';
 	    foreach($arr as $k => $v){
 	        $str .= '<tr>';
@@ -266,14 +392,11 @@ class Build {
 	            if($this->IsDel) $ActArr[] = '<a href="'.$this->LinkDel.'?'.http_build_query($_GET).'" onclick="return confirm(\'是否删除?\')">'.$this->NameDel.'</a>';
 	            $str .= '<td>'.implode(' ', $ActArr).'</td>';
 	            unset($_GET[$this->PrimaryKey]);
+	            $num++;
 	        }
 	        $str .= '</tr>';
 	    }
-	    $num = count($keyArr);
-	    if($this->IsEdit || $this->IsDel) $num++;
-	    if(!empty($Page)){
-	       $str .= '</tbody><tfoot><tr><td colspan="'.$num.'" class="page">'.$Page.'</td></tr></tfoot>';
-	    }
+	    if(!empty($Page)) $str .= '</tbody><tfoot><tr><td colspan="'.$num.'" class="page">'.$Page.'</td></tr></tfoot>';
 	    $str .= '</table>';
 	    return $str;
 	}
