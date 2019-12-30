@@ -13,7 +13,7 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  */
 class Build {
 	private static $s_instance;
-	public $Arr;
+	public $Arr = array();
 	public $Html;
 	public $Js;
 	public $Module = 'admin';
@@ -38,17 +38,10 @@ class Build {
 		return self::$s_instance;
 	}
 	
-/* 	function __construct(){
-	    $this->UploadUrl = url(array('backend', 'index', 'ajaxUpload'));
-	    $this->UploadEditUrl = url(array('backend', 'index', 'uploadEditor'));
-	} */
-	
-	
-	
-	public function Form($Method = 'POST', $Class = ''){
-	    $this->UploadUrl = !empty($this->UploadUrl) ? $this->UploadUrl : url(array('backend', 'index', 'ajaxUpload'));
-	    $this->UploadEditUrl = empty($this->UploadEditUrl) ? $this->UploadEditUrl : url(array('backend', 'index', 'uploadEditor'));
+	public function Form($Method = 'POST', $Class = '', $ExtHtml = ''){
 	    if(!is_array($this->Arr)) return;
+	    $this->UploadUrl = !empty($this->UploadUrl) ? $this->UploadUrl : url(array('backend', 'index', 'ajaxUpload'));
+	    $this->UploadEditUrl = !empty($this->UploadEditUrl) ? $this->UploadEditUrl : url(array('backend', 'index', 'uploadEditor'));
 	    $this->LinkIndex = !empty($this->LinkIndex) ? $this->LinkIndex : url(array($this->Module, \Router::$s_controller, 'index'));
 	    $this->LinkExport = !empty($this->LinkExport) ? $this->LinkExport : url(array($this->Module, \Router::$s_controller, 'export'));
 	    self::_Clean();
@@ -85,6 +78,8 @@ class Build {
 	                       $this->Html .= self::_FromMoney($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); break;	                       
                    case 'date':
                        $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'date', $v['Disabled'], $v['Placeholder']); break;
+                   case 'time':
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'time', $v['Disabled'], $v['Placeholder']); break;
                    case 'password':
                        $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'password', $v['Disabled'], $v['Placeholder']); break;
                    case 'button':
@@ -97,6 +92,10 @@ class Build {
                    case 'html':
                        if(empty($v['Class'])) $v['Class'] = 'primary';
                        $this->Html .= self::_html($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+                   case 'htmlStart':
+                       $this->Html .= self::_htmlStart($v['Name'], $v['Col']);break;
+                   case 'htmlEnd':
+                       $this->Html .= self::_htmlEnd();break;
                    case 'hidden':
                        if(empty($v['Class'])) $v['Class'] = 'primary';
                        $this->Html .= self::_Hidden($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
@@ -106,14 +105,12 @@ class Build {
 	       }
 	       if($Class != 'form-inline') $Col = 12;
 	       if($this->IsSubmit) $this->Html .= self::_FromButton('submit', '提交', $Col, 'primary');
-
-	       $this->Html .= '</form>';
+	       $this->Html .= $ExtHtml.'</form>';
 	       if(!empty($this->Js)){
 	           $this->Js =  '
 	               var URL_ROOT = "'.URL_ROOT.'";
                    var UploadBtn = {}, interval;'.$this->Js;
 	       }
-	       $this->Arr = array();
 	}
 	
 	public function FormOne($v){
@@ -177,10 +174,18 @@ class Build {
 	    return '<div class="form-group col-'.$Col.' " ><label for="Input_'.$Name.'">'.$Desc.'</label><div class="">'.$Value.'</div></div>';
 	}
 	
+	private function _HtmlStart($Name, $Col = 12){
+	    return '<div class="form-group row col-'.$Col.' htmlClass" id="Html_'.$Name.'">';
+	}
+	
+	private function _HtmlEnd(){
+	    return '</div>';
+	}
+	
 	private function _Hidden($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2'){
 	    return '<div class="form-group col-'.$Col.' d-none">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
-                        <input type="hidden" class="form-control" name="'.$Name.'" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'">
+                        <input type="hidden" class="form-control" name="'.$Name.'" id="Input_'.$Name.'" value="'.$Value.'">
                     </div>';
 	}
 	
@@ -200,7 +205,7 @@ class Build {
 	
 	private function _FormCheckbox($Name, $Desc, $Value, $DataArr = array(),  $Col, $IsDisabled = 0){ //Checkbox
 	    $ValueArr = explode('|', $Value);
-	    $Str = '<div class="form-group col-'.$Col.'""><label  class="mr-3">'.$Desc.'</label>';
+	    $Str = '<div class="form-group col-'.$Col.'""><label  class="mr-3 font-weight-bold">'.$Desc.'</label>';
 	    foreach($DataArr as $k => $v){
 	        $Checked = in_array($k, $ValueArr) ? 'checked="checked"' : '';
 	        $Str .= '<div class="form-check form-check-inline mr-3"><label class="checkbox-inline "><input type="checkbox" name="'.$Name.'['.$k.']"  value="1" '.$Checked.' > '.$v.'</label></div>';
@@ -223,14 +228,17 @@ class Build {
 	
 	private function _FormUpload($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
-	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
 	    $StrHtml = $StrJs = '';
 	    $StrHtml .= '<div class="form-group col-'.$Col.'">
                                     <label for="Input_'.$Name.'">'.$Desc.'</label>
                                     <div class="input-group">
-                                      <input type="text" class="form-control" '.$IsDisabled.' placeholder="'.$Placeholder.'" name="'.$Name.'" Id="Img_'.$Name.'" value="'.$Value.'">
+                                      <input type="text" class="form-control" '.$Disabled.' placeholder="'.$Placeholder.'" name="'.$Name.'" Id="Img_'.$Name.'" value="'.$Value.'">
                                       <span class="input-group-append">
-                                        <button class="btn btn-success" id="uploadImg_'.$Name.'" type="button">上传图片</button>
+                                        <button class="btn btn-success" id="uploadImg_'.$Name.'" type="button">上传</button>
+                                      </span>
+                                             <span class="input-group-append">
+                                        <button class="btn btn-danger" id="ViewImg_'.$Name.'" type="button">查看</button>
                                       </span>
                                     </div>
                                   </div> ';
@@ -254,6 +262,7 @@ class Build {
                               }
                           });
 	                       ';
+	    $StrJs .= '$("#ViewImg_'.$Name.'").click(function(){ window.open($("#Img_'.$Name.'").val()); });';
 	    return array($StrHtml, $StrJs);
 	}
 	
@@ -313,13 +322,13 @@ class Build {
                     "removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
                     "insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
                   })
-            })';
+            });';
         return array($StrHtml, $StrJs);
 	}
 	
 	private function _FromMoney($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //金钱
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
-	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
 	    return '<div class="form-group col-'.$Col.'">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
                             <div class="input-group mb-3">
@@ -346,7 +355,7 @@ class Build {
 	
 	private function _FormTextarea($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //输入框
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
-	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
 	    return '<div class="form-group col-'.$Col.'">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
                         <textarea class="form-control" name="'.$Name.'" '.$Disabled.' rows="3" id="Input_'.$Name.'" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
@@ -364,11 +373,13 @@ class Build {
 	    if(empty($this->LinkDel)) $this->LinkDel = url(array($this->Module, \Router::$s_controller, 'del'));
 	    $str = '<table class="table"><thead><tr>';
 	    foreach($keyArr as $k => $v) $str .= '<th  scope="col">'.$v['Name'].'</th>';
-	    if($this->IsEdit || $this->IsDel) $str .= '<th  scope="col">操作</th>';
+	    if($this->IsEdit || $this->IsDel) $str .= '<th  scope="col">操作</th>';	    
 	    $str .= '</tr></thead><tbody>';
-	    foreach($arr as $k => $v){
+	    foreach($arr as $k => $v){	        
 	        $str .= '<tr>';
 	        foreach($keyArr as $sk => $sv){
+	            $Pre = isset($sv['Pre']) ? $sv['Pre'] : '';
+	            //var_dump($sv);
 	            switch ($sv['Type']){
 	                case 'Date':
 	                    $str .= '<td>'.date('Y-m-d', $v[$sk]).'</td>';break;
@@ -379,10 +390,10 @@ class Build {
                         $Text = ($v[$sk]) ? '是' : '否';
                         $str .= '<td><span class="text-'.$IsTrue.'">'.$Text.'</span></td>';break;
                     case 'Key':
-                        $str .= '<td>'.$keyArr[$sk]['Data'][$v[$sk]].'</td>';break;
+                        $str .= '<td>'.$Pre.$keyArr[$sk]['Data'][$v[$sk]].'</td>';break;
                         break;
 	                default:
-	                    $str .= '<td>'.$v[$sk].'</td>';break;
+	                    $str .= '<td>'.$Pre.$v[$sk].'</td>';break;
 	            }	            
 	        }
 	        if($this->IsEdit || $this->IsDel){

@@ -20,18 +20,18 @@ class Cookie {
 		}
 		return self::$s_instance;
 	}
-	public function set($arr, $hour = 0) {
+	public function set($arr, $pre = '', $hour = 0) {
 		$time = empty ( $hour ) ? $this->expire * 60 * 60 : $hour * 60 * 60;
 		foreach ( $arr as $k => $v ) {
-			setcookie ( $k, $v, time () + $time, '/', '' );
+			setcookie ( $pre.'_'.$k, $v, time () + $time, '/', '' );
 		}
 	}
-	public function get($k) {
-		return empty ( $_COOKIE [$k] ) ? 0 : $_COOKIE [$k];
+	public function get($k, $pre = '') {
+		return empty ( $_COOKIE [$pre.'_'.$k] ) ? '' : $_COOKIE [$pre.'_'.$k];
 	}
-	public function del($arr) {
+	public function del($arr, $pre = '') {
 		foreach ( $arr as $k => $v ) {
-			setcookie ( $k, '', time () - ($this->expire * 60 * 60), '/', '' );
+			setcookie ( $pre.'_'.$k, '', time () - ($this->expire * 60 * 60), '/', '' );
 		}
 	}
 }
