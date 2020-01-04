@@ -1,7 +1,8 @@
 <?php
-use Helper as help;
 use Helper\Code;
 use Helper\Build;
+use Helper\Cookie;
+use Helper\CurlQ;
 defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 
 /*
@@ -17,14 +18,16 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 abstract class Base {
 	public $pageNum = 20;
 	public $temp_arr = array ();
-	public $cookieObj;
+	public $CookieObj;
 	public $CodeObj;
 	public $BuildObj;
+	public $CurlObj;
 	public $Ret = array('Code' => 0, 'Data' => array(), 'Msg' => '');
 	function __construct() {
 	    $this->CodeObj = Code::get_instance();
 	    $this->BuildObj = Build::get_instance();
-		$this->cookieObj =  help\Cookie::get_instance();
+		$this->CookieObj = Cookie::get_instance();		
+		$this->CurlObj = CurlQ::get_instance();
 	}
 	
 	public function ApiErr($Code, $Msg = '参数错误'){
