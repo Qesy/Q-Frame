@@ -20,7 +20,7 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  */
 abstract class Base {
 	public $CommonObj;	
-	public $CookieObj;
+	public $CookieObj; 
 	public $CodeObj;
 	public $BuildObj;
 	public $CurlObj;
