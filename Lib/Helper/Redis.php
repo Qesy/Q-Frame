@@ -25,8 +25,8 @@ class Redis {
 				$configArr = db_config ();
 				$dbKey = ! isset ( $configArr [SERVER_ID] ['redis_db'] ) ? 0 : $configArr [SERVER_ID] ['redis_db'];
 				// self::$_redis->select($dbKey);
-			} catch ( Exception $e ) {
-				throw new Exception ( '连接Redis失败！' . $e->getMessage () );
+			} catch ( \Exception $e ) {
+				throw new \Exception( '连接Redis失败！' . $e->getMessage () );
 			}
 		}
 		return self::$_redis;
