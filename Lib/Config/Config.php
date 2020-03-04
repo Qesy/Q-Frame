@@ -16,13 +16,13 @@ function db_config() {
 			'Host' => '127.0.0.1',  
 			'Accounts' => 'root',
 			'Password' => 'root',
-			'Name' => 'weishop',
+			'Name' => 'qcms',
 			'Port' => '3306',
-			'Prefix' => 'ws_',
+			'Prefix' => 'qcms_',
 			'Charset' => 'utf8' 
 	);
 }
-function site_config() {
+function SiteConfig() {
 	return array (
 			'UrlType' => '0',
 			'Extend' => '.html',
@@ -31,6 +31,13 @@ function site_config() {
 			'Language' => 'en',
 			'Url' => '/' 
 	);
+}
+
+function __autoload($classname) { // -- 自动加载类 --
+    $filename = PATH_LIB . $classname . '.php';
+    $filename = str_replace('\\', '/', $filename);
+    if (file_exists ( $filename ))
+        require $filename;
 }
 
 const WEB_DOMAIN = 'www.qframework.com';

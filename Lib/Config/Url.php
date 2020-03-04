@@ -1,5 +1,5 @@
 <?php
-function url_config(){ //$str2 = '/^\/news\/detail\/(\w+)\/bbb\/(\d+)/'; //匹配不到走原来的模式
+function UrlConfig(){ //$str2 = '/^\/news\/detail\/(\w+)\/bbb\/(\d+)/'; //匹配不到走原来的模式
     return array(
         array('search' =>'category/(\d+)' , 'action' => 'index/category/{$1}'),
         array('search' =>'detail/(\d+)' , 'action' => 'index/detail/{$1}'),

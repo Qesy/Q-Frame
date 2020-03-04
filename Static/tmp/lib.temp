@@ -1,0 +1,19 @@
+<?php
+namespace Model;
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
+/*
+ * Name 	: {ClassName}
+ * Date 	: {Date}
+ * Author 	: Qesy
+ * QQ 		: 762264
+ * Mail 	: 762264@qq.com
+ * Company	: Shanghai Rong Yi Technology Co., Ltd.
+ * Web		: http://www.sj-web.com.cn/
+ * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
+ *
+ */
+class {ClassName} extends \Db_pdo {
+	public $TableName = '{Table}';
+	public $PrimaryKey = '{PrimaryKey}';
+	
+}

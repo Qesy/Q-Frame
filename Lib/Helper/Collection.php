@@ -1,4 +1,6 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php 
+namespace Helper;
+defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 /*
  * Name   : Collection
  * Date	  : 20120107 
@@ -139,6 +141,29 @@ class Collection{
 			return $str;
 		}
 		return str_replace($matches[0], '', $str);
+	}
+	
+	/*
+	 * name : 去除链接
+	 * return ：String
+	 */
+	public function removeLink($str){
+	   preg_match_all('/<a ([\s\S.]*?)">([\s\S.]*?)<\/a>/', $str, $matches);
+	    if(empty($matches)){
+	        return $str;
+	    }
+	    return str_replace($matches[0], $matches[2], $str); 
+	}
+	/*
+	 * name : 去除图片
+	 * return ：String
+	 */
+	public function removeImg($str){
+	    preg_match_all('/<img([\s\S.]*?)\/>/', $str, $matches);
+	    if(empty($matches)){
+	        return $str;
+	    }
+	    return str_replace($matches[0], '', $str);
 	}
 	/*
 	 * name : 去除CSS

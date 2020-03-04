@@ -11,6 +11,8 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  *
  */
 class Db_pdo extends Db {
+    public $TableName;
+    public $PrimaryKey;
 	public static $_instance = array ();
 	
 	public static function get_instance() {
@@ -34,6 +36,10 @@ class Db_pdo extends Db {
 		$this->sqlSetArr ['Field'] = $Field;
 		return $this;
 	}
+	public function SetTable(){
+	    $this->sqlSetArr ['TbName'] = $this->TableName;
+	    return $this;
+	}	
 	public function SetTbName($TbName) {
 		$this->sqlSetArr ['TbName'] = $TbName;
 		return $this;

@@ -11,7 +11,6 @@ defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
  * (̅_̅_̅(̲̅(̅_̅_̅_̅_̅_̅_̅_̅()ڪے
  *
  */
-require PATH_LIB . 'Config/Common' . EXTEND;
 require PATH_LIB . 'Config/Base' . EXTEND;
 require PATH_LIB . 'Config/Controllers' . EXTEND;
 require PATH_LIB . 'Config/Db' . EXTEND;

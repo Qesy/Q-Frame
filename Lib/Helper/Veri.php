@@ -21,6 +21,14 @@ class Veri {
 		}
 		return self::$s_instance;
 	}
+	
+	public function VeriPara(array $Request , array $ParaArr){
+	    foreach($ParaArr as $v){
+	        if(empty($Request[$v])) return false;
+	    }
+	    return true;
+	}
+	
 	public function email($email) {
 		return filter_var ( $email, FILTER_VALIDATE_EMAIL );
 	}
