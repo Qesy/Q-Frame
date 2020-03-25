@@ -31,7 +31,7 @@ class Build {
 	public $NameDel = '删除';
 	public $UploadUrl;
 	public $UploadEditUrl;
-	public $TempObj;
+	public $CommonObj;
 	public static function get_instance() {
 		if (! isset ( self::$s_instance )) {
 			self::$s_instance = new self ();
@@ -40,15 +40,15 @@ class Build {
 	}
 	
 	function __construct(){
-	    $this->TempObj = Template::get_instance();
+	    $this->CommonObj = Common::get_instance();
 	}
 	
 	public function Form($Method = 'POST', $Class = '', $ExtHtml = ''){
 	    if(!is_array($this->Arr)) return;
-	    $this->UploadUrl = !empty($this->UploadUrl) ? $this->UploadUrl : $this->TempObj->Url(array('backend', 'index', 'ajaxUpload'));
-	    $this->UploadEditUrl = !empty($this->UploadEditUrl) ? $this->UploadEditUrl : $this->TempObj->Url(array('backend', 'index', 'uploadEditor'));
-	    $this->LinkIndex = !empty($this->LinkIndex) ? $this->LinkIndex : $this->TempObj->Url(array($this->Module, \Router::$s_controller, 'index'));
-	    $this->LinkExport = !empty($this->LinkExport) ? $this->LinkExport : $this->TempObj->Url(array($this->Module, \Router::$s_controller, 'export'));
+	    $this->UploadUrl = !empty($this->UploadUrl) ? $this->UploadUrl : $this->CommonObj->Url(array('backend', 'index', 'ajaxUpload'));
+	    $this->UploadEditUrl = !empty($this->UploadEditUrl) ? $this->UploadEditUrl : $this->CommonObj->Url(array('backend', 'index', 'uploadEditor'));
+	    $this->LinkIndex = !empty($this->LinkIndex) ? $this->LinkIndex : $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'index'));
+	    $this->LinkExport = !empty($this->LinkExport) ? $this->LinkExport : $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'export'));
 	    self::_Clean();
 	    $this->Html = '<form method="'.$Method.'" class="BuildForm '.$Class.'">';
 	    foreach($this->Arr as $k => $v){
@@ -373,9 +373,9 @@ class Build {
 	 */
 	public function Table(array $arr, $keyArr, $Page = ''){
 	    $num = count($keyArr);
-	    if(empty($this->LinkAdd)) $this->LinkAdd = $this->TempObj->Url(array($this->Module, \Router::$s_controller, 'add'));
-	    if(empty($this->LinkEdit)) $this->LinkEdit = $this->TempObj->Url(array($this->Module, \Router::$s_controller, 'edit'));
-	    if(empty($this->LinkDel)) $this->LinkDel = $this->TempObj->Url(array($this->Module, \Router::$s_controller, 'del'));
+	    if(empty($this->LinkAdd)) $this->LinkAdd = $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'add'));
+	    if(empty($this->LinkEdit)) $this->LinkEdit = $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'edit'));
+	    if(empty($this->LinkDel)) $this->LinkDel = $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'del'));
 	    $str = '<table class="table"><thead><tr>';
 	    foreach($keyArr as $k => $v) $str .= '<th  scope="col">'.$v['Name'].'</th>';
 	    if($this->IsEdit || $this->IsDel) $str .= '<th  scope="col">操作</th>';	    
