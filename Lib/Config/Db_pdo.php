@@ -93,7 +93,7 @@ class Db_pdo extends Db {
 		return self::select ( $cond_arr, $field, $tb_name, $index, $limit, $sort, 1, $isDebug );
 	}
 	public function select($cond_arr = array(), $field = '*', $tb_name = '', $index = 0, $limit = '', $sort = '', $fetch = 0, $isDebug = 0) {
-		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
+		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$limit_str = ! is_array ( $limit ) ? $limit : ' limit ' . $limit [0] . ',' . $limit [1] . '';
 		$sort_str = $this->sort ( $sort );
 		$sql = "SELECT " . $field . " FROM " . $this->p_dbConfig ['Prefix'] . $tb_name . $this->get_sql_cond ( $cond_arr ) . $sort_str . $limit_str . "";
@@ -113,14 +113,14 @@ class Db_pdo extends Db {
 		return self::select ( $cond_arr, $field, $tb_name, $index, $limit, $sort, 0, $isDebug );
 	}
 	public function insert($insert_arr = array(), $tb_name = 0, $isDebug = 0) {
-		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
+		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$value_str = parent::get_sql_insert ( $insert_arr );
 		$sql = "INSERT INTO " . $this->p_dbConfig ['Prefix'] . $tb_name . $value_str . "";
 		! $isDebug || var_dump ( $sql );
 		return $this->exec ( $sql );
 	}
 	public function insertBatch($insert_arr = array(), $tb_name = 0, $isDebug = 0){
-		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
+		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$keyStr =  implode(', ', array_keys($insert_arr[0]));
 		$valStrArr = array();
 		foreach($insert_arr as $k => $v){
@@ -131,14 +131,14 @@ class Db_pdo extends Db {
 		return $this->exec ( $sql );
 	}
 	public function replace($insert_arr = array(), $tb_name = 0, $isDebug = 0) {
-		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
+		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$value_str = parent::get_sql_insert ( $insert_arr );
 		$sql = "REPLACE INTO " . $this->p_dbConfig ['Prefix'] . $tb_name . $value_str . "";
 		! $isDebug || var_dump ( $sql );
 		return $this->exec ( $sql );
 	}
 	public function update($update_arr = array(), $cond_arr = array(), $tb_name = 0, $isDebug = 0) {
-		$tb_name = empty ( $tb_name ) ? 0 : $tb_name;
+		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$update_str = parent::get_sql_update ( $update_arr );
 		$cond_str = parent::get_sql_cond ( $cond_arr );
 		$sql = "UPDATE " . $this->p_dbConfig ['Prefix'] . $tb_name . " SET " . $update_str . $cond_str . "";
@@ -146,6 +146,7 @@ class Db_pdo extends Db {
 		return $this->exec ( $sql );
 	}
 	public function delete($cond_arr = array(), $tb_name = 0, $isDebug = 0) {
+	    $tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$sql = "DELETE FROM " . $this->p_dbConfig ['Prefix'] . $tb_name . parent::get_sql_cond ( $cond_arr ) . "";
 		! $isDebug || var_dump ( $sql );
 		return $this->exec ( $sql );

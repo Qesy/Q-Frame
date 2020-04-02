@@ -24,6 +24,18 @@ class Common {
 		return self::$s_instance;
 	}
 	
+	public function Err($Str){
+	    self::ExecScript('alert("'.$Str.'");window.history.go(-1);');
+	}
+	
+	public function Success($Url, $Str = ''){
+	    if(!empty($Str)){
+	        self::ExecScript('alert("'.$Str.'"); window.location.href="'.$Url.'?'.http_build_query($_GET).'"');
+	    }else{
+	        self::ExecScript('window.location.href="'.$Url.'?'.http_build_query($_GET).'"');
+	    }
+	}
+	
 	public function ApiErr($Code, $Msg = '参数错误'){
 	    $this->Ret['Code'] = $Code;
 	    $this->Ret['Msg'] = $Msg;
