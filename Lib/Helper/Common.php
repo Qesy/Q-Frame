@@ -24,6 +24,16 @@ class Common {
 		return self::$s_instance;
 	}
 	
+	public function GetQuery(){
+	    return empty($_SERVER['QUERY_STRING']) ? array() : explode('=', $_SERVER['QUERY_STRING']);
+	}
+	
+	public function SetQuery($Key, $Val){
+	    $Query = self::GetQuery();
+	    $Query[$Key] = $Val;
+	    return $Query;
+	}
+	
 	public function Err($Str){
 	    self::ExecScript('alert("'.$Str.'");window.history.go(-1);');
 	}

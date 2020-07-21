@@ -397,6 +397,9 @@ class Build {
                     case 'Key':
                         $str .= '<td>'.$Pre.$keyArr[$sk]['Data'][$v[$sk]].'</td>';break;
                         break;
+                    case 'Money':
+                        $str .= '<td>&yen; '.$v[$sk].'</td>';
+                        break;
 	                default:
 	                    $str .= '<td>'.$Pre.$v[$sk].'</td>';break;
 	            }	            

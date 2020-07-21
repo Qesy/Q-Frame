@@ -7,6 +7,9 @@ class Index extends Controllers {
 	}
 	
 	public function test_Action(){
+	    var_dump($this->CommonObj->GetQuery());
+	    $this->CommonObj->SetQuery('aa', 'bb');
+	    var_dump($this->CommonObj->GetQuery());
 		echo 'test';
 	}
 }

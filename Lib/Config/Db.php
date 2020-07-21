@@ -113,9 +113,6 @@ abstract class Db {
 		}
 		$cond_arr_t = array ();
 		foreach ( $cond_arr as $key => $val ) {
-			if (is_array ( $val ) && empty ( $val )) {
-				continue;
-			}
 			if (is_array ( $val )) {
 				$cond_arr_t [] = $key . " in (" . self::get_sql_cond_by_in ( $val ) . ")";
 			} else {

@@ -80,6 +80,9 @@ class Db_pdo extends Db {
 	public function ExecInsert() {
 		return self::insert ( $this->sqlSetArr ['Insert'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['IsDebug'] );
 	}
+	public function ExecInsertBatch() {
+		return self::insertBatch( $this->sqlSetArr ['Insert'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['IsDebug'] );
+	}
 	public function ExecReplace() {
 		return self::replace ( $this->sqlSetArr ['Insert'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['IsDebug'] );
 	}
@@ -126,7 +129,7 @@ class Db_pdo extends Db {
 		foreach($insert_arr as $k => $v){
 			$valStrArr[] = "('".implode("', '", array_values($v))."')" ;
 		}
-		$sql = "INSERT INTO " . $tb_name . ' ('.$keyStr .') VALUES '. implode(',', $valStrArr);
+		$sql = "INSERT INTO " . $this->p_dbConfig ['Prefix'].$tb_name . ' ('.$keyStr .') VALUES '. implode(',', $valStrArr);
 		! $isDebug || var_dump ( $sql );
 		return $this->exec ( $sql );
 	}
