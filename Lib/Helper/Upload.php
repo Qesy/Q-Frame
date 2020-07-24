@@ -29,8 +29,11 @@ class Upload {
 	public function upload_file($fileRs) {
 		$ext = substr ( strrchr ( $fileRs ['name'], '.' ), 1 );
 
-		if (! is_uploaded_file ( $fileRs ['tmp_name'] ) || ! in_array ( $ext, $this->_type )) {
+		if (! is_uploaded_file ( $fileRs ['tmp_name'] )) {
 			return - 1;
+		}
+		if(! in_array ( $ext, $this->_type )){
+		    return - 3;
 		}
 		if ($fileRs ['size'] > ($this->_size * 1024 * 1024)) {
 			return - 2;

@@ -76,7 +76,11 @@ class Common {
 	}
 	
 	public function GetRefer(){ //获取上一页
-	    return $_SERVER['HTTP_REFERER'];
+	    return htmlentities($_SERVER['HTTP_REFERER']);
+	}
+	
+	public function GetUa(){ //获取UA
+	    return htmlentities($_SERVER['HTTP_USER_AGENT']);
 	}
 	
 	public function HttpBuildQueryQ($Arr){
@@ -104,13 +108,13 @@ class Common {
 	    return empty ( $noWaterMark ) ? $path . '_w' . $width . '_h' . $heiht . $ext : $path . '_w' . $width . '_h' . $heiht . '_' . $noWaterMark . $ext;
 	}
 	
-	public function LoadView($Temp, $Data = array()) { // -- Name : 加载模版 --
+	/* public function LoadView($Temp, $Data = array()) { // -- Name : 加载模版 --
 	    if (! is_file ( PATH_SYS . 'View/' . $Temp . EXTEND )) die ( PATH_SYS . 'View/' . $Temp . EXTEND . ' not found !' );
 	
 	    $this->TempArr = empty ( $Data ) ? $this->TempArr : $Data;
 	    foreach ( $this->TempArr as $Key => $Val ) $$Key = $Val;
 	    require PATH_SYS . 'View/' . $Temp . EXTEND;
-	}
+	} */
 	public function LoadCss(array $CssArr) { // -- Name : 加载CSS --
 	    foreach ( $CssArr as $Val ) echo "<link href=\"" . URL_CSS . $Val . ".css?v=". VERSION ."\" rel=\"stylesheet\" type=\"text/css\" />\n";
 	}

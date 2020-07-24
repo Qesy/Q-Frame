@@ -47,8 +47,8 @@ class Build {
 	    if(!is_array($this->Arr)) return;
 	    $this->UploadUrl = !empty($this->UploadUrl) ? $this->UploadUrl : $this->CommonObj->Url(array('backend', 'index', 'ajaxUpload'));
 	    $this->UploadEditUrl = !empty($this->UploadEditUrl) ? $this->UploadEditUrl : $this->CommonObj->Url(array('backend', 'index', 'uploadEditor'));
-	    $this->LinkIndex = !empty($this->LinkIndex) ? $this->LinkIndex : $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'index'));
-	    $this->LinkExport = !empty($this->LinkExport) ? $this->LinkExport : $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'export'));
+	    $this->LinkIndex = !empty($this->LinkIndex) ? $this->LinkIndex : $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'index'));
+	    $this->LinkExport = !empty($this->LinkExport) ? $this->LinkExport : $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'export'));
 	    self::_Clean();
 	    $this->Html = '<form method="'.$Method.'" class="BuildForm '.$Class.'">';
 	    foreach($this->Arr as $k => $v){
@@ -85,6 +85,8 @@ class Build {
                        $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'date', $v['Disabled'], $v['Placeholder']); break;
                    case 'time':
                        $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'time', $v['Disabled'], $v['Placeholder']); break;
+                   case 'datetime':
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'datetime-local', $v['Disabled'], $v['Placeholder']); break;
                    case 'password':
                        $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'password', $v['Disabled'], $v['Placeholder']); break;
                    case 'button':
@@ -96,7 +98,10 @@ class Build {
                        $this->Html .= self::_FromLink($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
                    case 'html':
                        if(empty($v['Class'])) $v['Class'] = 'primary';
-                       $this->Html .= self::_html($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
+                       $this->Html .= self::_html($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class'], 2);break;
+                   case 'htmlFill':
+                       if(empty($v['Class'])) $v['Class'] = 'primary';
+                       $this->Html .= self::_html($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class'], 1);break;
                    case 'htmlStart':
                        $this->Html .= self::_htmlStart($v['Name'], $v['Col']);break;
                    case 'htmlEnd':
@@ -109,7 +114,7 @@ class Build {
 	           }
 	       }
 	       if($Class != 'form-inline') $Col = 12;
-	       if($this->IsSubmit) $this->Html .= self::_FromButton('submit', '提交', $Col, 'primary');
+	       if($this->IsSubmit) $this->Html .= self::_FromButton('submit', '提交', 'submit', $Col, 'primary');
 	       $this->Html .= $ExtHtml.'</form>';
 	       if(!empty($this->Js)){
 	           $this->Js =  '
@@ -172,15 +177,19 @@ class Build {
 	}
 	
 	private function _FromLink($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2'){ //链接
-	    return '<div class="form-group col-'.$Col.'"><a href="'.$Value.'" class="btn '.$Class.'" target="'.$Data.'">'.$Desc.'</a></a></div>';
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'"><a href="'.$Value.'" class="btn '.$Class.'" target="'.$Data.'">'.$Desc.'</a></a></div>';
 	}
 	
-	private function _Html($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2'){
-	    return '<div class="form-group col-'.$Col.' " ><label for="Input_'.$Name.'">'.$Desc.'</label><div class="">'.$Value.'</div></div>';
+	private function _Html($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2', $IsFill = 2){
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    $IsFillStr = ($IsFill == 1) ? 'd-none d-lg-block' : '';
+	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.' '.$IsFillStr.'"  ><label for="Input_'.$Name.'">'.$Desc.'</label><div class="">'.$Value.'</div></div>';
 	}
 	
 	private function _HtmlStart($Name, $Col = 12){
-	    return '<div class="form-group row col-'.$Col.' htmlClass" id="Html_'.$Name.'">';
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group row col-'.$SubCol.' col-lg-'.$Col.' htmlClass" id="Html_'.$Name.'">';
 	}
 	
 	private function _HtmlEnd(){
@@ -188,18 +197,21 @@ class Build {
 	}
 	
 	private function _Hidden($Name, $Desc, $Value, $Col = 12, $Data = '_blank', $Class = 'btn-success ml-2'){
-	    return '<div class="form-group col-'.$Col.' d-none">
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.' d-none">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
                         <input type="hidden" class="form-control" name="'.$Name.'" id="Input_'.$Name.'" value="'.$Value.'">
                     </div>';
 	}
 	
 	private function _FromButton($Name, $Desc, $Type, $Col = 12, $Class = 'primary'){ //Button
-	    return '<div class="form-group col-'.$Col.'"><button type="'.$Type.'" class="btn btn-'.$Class.'" id="Button_'.$Name.'">'.$Desc.'</button></div>';
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'"><button type="'.$Type.'" class="btn btn-'.$Class.' " id="Button_'.$Name.'">'.$Desc.'</button></div>';
 	}
 	
 	private function _FormRadio($Name, $Desc, $Value, $DataArr = array(),  $Col, $IsDisabled = 0){
-	    $Str = '<div class="form-group col-'.$Col.'""><label  class="mr-3">'.$Desc.'</label>';
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    $Str = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'""><label  class="mr-3">'.$Desc.'</label>';
 	    foreach($DataArr as $k => $v){
 	        $Checked = ($Value == $k) ? 'checked="checked"' : '';
 	        $Str .= '<label class="radio-inline mr-3"><input type="radio" name="'.$Name.'"  value="'.$k.'" '.$Checked.'> '.$v.'</label>';
@@ -209,10 +221,11 @@ class Build {
 	}
 	
 	private function _FormCheckbox($Name, $Desc, $Value, $DataArr = array(),  $Col, $IsDisabled = 0){ //Checkbox
-	    $ValueArr = explode('|', $Value);
-	    $Str = '<div class="form-group col-'.$Col.'""><label  class="mr-3 font-weight-bold">'.$Desc.'</label>';
+	    //$ValueArr = explode('|', $Value);
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    $Str = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'""><label  class="mr-3 font-weight-bold">'.$Desc.'</label>';
 	    foreach($DataArr as $k => $v){
-	        $Checked = in_array($k, $ValueArr) ? 'checked="checked"' : '';
+	        $Checked = in_array($k, $Value) ? 'checked="checked"' : '';
 	        $Str .= '<div class="form-check form-check-inline mr-3"><label class="checkbox-inline "><input type="checkbox" name="'.$Name.'['.$k.']"  value="1" '.$Checked.' > '.$v.'</label></div>';
 	    }
 	    $Str .= '</div>';
@@ -222,7 +235,8 @@ class Build {
 	private function _FromSelect($Name, $Desc, $Value, $Col, $DataArr = array(),  $IsDisabled = 0){ //select
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
-	    $Str = '<div class="form-group col-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label><select class="form-control" name="'.$Name.'" id="Input_'.$Name.'" '.$Disabled.'>';
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    $Str = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label><select class="form-control" name="'.$Name.'" id="Input_'.$Name.'" '.$Disabled.'>';
 	    foreach($DataArr as $sk => $sv){
 	        $selected = ($sk == $Value) ? 'selected' : '';
 	        $Str .= '<option value="'.$sk.'" '.$selected.'>'.$sv.'</option>';
@@ -235,7 +249,8 @@ class Build {
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
 	    $StrHtml = $StrJs = '';
-	    $StrHtml .= '<div class="form-group col-'.$Col.'">
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    $StrHtml .= '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
                                     <label for="Input_'.$Name.'">'.$Desc.'</label>
                                     <div class="input-group">
                                       <input type="text" class="form-control" '.$Disabled.' placeholder="'.$Placeholder.'" name="'.$Name.'" Id="Img_'.$Name.'" value="'.$Value.'">
@@ -275,7 +290,8 @@ class Build {
 	private function _FormSlide($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //多图
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
-	    $StrHtml = '<div class="col-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label>';
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    $StrHtml = '<div class="col='.$SubCol.' col-lg-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label>';
 	    $StrJs = '';
 	    $ValueArr = explode('|', $Value);
 	    foreach($ValueArr as $sk => $sv){
@@ -312,29 +328,19 @@ class Build {
 	private function _FormEditor($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //编辑器
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
-	    $StrHtml = '<div class="form-group col-'.$Col.'">
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    $StrHtml = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
-                        <textarea class="form-control" name="'.$Name.'" '.$IsDisabled.' rows="16" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
+                        <textarea class="form-control Input_Editor" name="'.$Name.'" '.$IsDisabled.' rows="16" id="Input_'.$Name.'" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
                     </div>';
-        $StrJs = 'var editor;
-            KindEditor.ready(function(K) {
-                editor = K.create(\'textarea[name="'.$Name.'"]\', {
-                    allowFileManager : true,
-                    themeType : "simple",
-                    urlType : "absolute",
-                    uploadJson : "'.$this->UploadEditUrl.'",
-                    items : ["source","code","fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline",
-                    "removeformat", "|", "justifyleft", "justifycenter", "justifyright", "insertorderedlist",
-                    "insertunorderedlist", "|", "image", "flash", "media","insertfile","link","unlink","|","table","fullscreen"]
-                  })
-            });';
-        return array($StrHtml, $StrJs);
+        return array($StrHtml);
 	}
 	
 	private function _FromMoney($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //金钱
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
-	    return '<div class="form-group col-'.$Col.'">
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend"><span class="input-group-text">&yen;</span></div>
@@ -347,21 +353,24 @@ class Build {
 	private function _FromInput($Name, $Desc, $Value, $Col, $Type = 'text', $IsDisabled = 0, $Placeholder = ''){ //输入框
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
-	    return '<div class="form-group col-'.$Col.'">
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
                         <input type="'.$Type.'" '.$Disabled.' class="form-control" name="'.$Name.'" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'">
                     </div>';
 	}
 	
 	private function _FromGroup($Col, $Desc){ //填充而已
-	    return '<div class="form-group col-'.$Col.'">'.$Desc.' 
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group col-'.$SubCol.'  col-lg-'.$Col.'">'.$Desc.' 
                     </div>';
 	}
 	
 	private function _FormTextarea($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //输入框
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
-	    return '<div class="form-group col-'.$Col.'">
+	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
+	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
                         <label for="Input_'.$Name.'">'.$Desc.'</label>
                         <textarea class="form-control" name="'.$Name.'" '.$Disabled.' rows="3" id="Input_'.$Name.'" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
                       </div>';
@@ -373,9 +382,9 @@ class Build {
 	 */
 	public function Table(array $arr, $keyArr, $Page = ''){
 	    $num = count($keyArr);
-	    if(empty($this->LinkAdd)) $this->LinkAdd = $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'add'));
-	    if(empty($this->LinkEdit)) $this->LinkEdit = $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'edit'));
-	    if(empty($this->LinkDel)) $this->LinkDel = $this->CommonObj->Url(array($this->Module, \Router::$s_controller, 'del'));
+	    if(empty($this->LinkAdd)) $this->LinkAdd = $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'add'));
+	    if(empty($this->LinkEdit)) $this->LinkEdit = $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'edit'));
+	    if(empty($this->LinkDel)) $this->LinkDel = $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'del'));
 	    $str = '<table class="table"><thead><tr>';
 	    foreach($keyArr as $k => $v) $str .= '<th  scope="col">'.$v['Name'].'</th>';
 	    if($this->IsEdit || $this->IsDel) $str .= '<th  scope="col">操作</th>';	    
