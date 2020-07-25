@@ -5,6 +5,7 @@ use Helper\Cookie;
 use Helper\CurlQ;
 use Helper\Veri;
 use Helper\Common;
+use Helper\Upload;
 defined ( 'PATH_SYS' ) || exit ( 'No direct script access allowed' );
 
 /*
@@ -24,6 +25,7 @@ abstract class Base {
 	public $BuildObj;
 	public $CurlObj;
 	public $VeriObj;
+	public $UploadObj;
 	
 	function __construct() {
 	    $this->CodeObj = Code::get_instance();
@@ -32,6 +34,7 @@ abstract class Base {
 		$this->CurlObj = CurlQ::get_instance();
 		$this->VeriObj = Veri::get_instance();
 		$this->CommonObj = Common::get_instance();		
+		$this->UploadObj = Upload::get_instance();
 	}
 	
 	public static function InsertFuncArray(array $ControllerArr) { // -- Name : 回调函数 --
