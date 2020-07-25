@@ -46,30 +46,32 @@ abstract class Db {
 			return self::$s_db_obj;
 		}
 		try {
-			self::$s_db_obj  = new PDO ( 'mysql:dbname=' . $this->p_dbConfig ['Name'] . ';host=' . $this->p_dbConfig ['Host'] . '', $this->p_dbConfig ['Accounts'], $this->p_dbConfig ['Password'], array (
+		    if($this->p_dbConfig ['SqlType'] == 'SQLite'){
+		        self::$s_db_obj   = new PDO('sqlite:'.PATH_LIB.'Config/'.$this->p_dbConfig ['Name'].'.db');
+		    }else{
+		          self::$s_db_obj  = new PDO ( 'mysql:dbname=' . $this->p_dbConfig ['Name'] . ';host=' . $this->p_dbConfig ['Host'] . '', $this->p_dbConfig ['Accounts'], $this->p_dbConfig ['Password'], array (
 					PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
-			) );
+			      ) );
+		          self::$s_db_obj ->exec ( "SET NAMES " . $this->p_dbConfig ['Charset'] );
+		    }
 		} catch ( PDOException $e ) {
 			echo 'Connection failed: ' . $e->getMessage ();
 			exit ();
 		}
-		self::$s_db_obj ->exec ( "SET NAMES " . $this->p_dbConfig ['Charset'] );
+		
 	}
 	
 	/*
 	 * Name : 查询
 	 */
-	public function query($sql, $fetch_mode = 0) {
+	public function query($sql, $getArr, $fetch_mode = 0) {
 		self::_clean ();
-		$result = self::$s_db_obj ->query ( $sql );
-		if ($result) {
-			if (empty ( $fetch_mode )) {
-				$rs = $result->fetchAll ( PDO::FETCH_ASSOC );
-			} else {
-				$rs = $result->fetch ( PDO::FETCH_ASSOC );
-			}
+		$sth = self::$s_db_obj->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute($getArr);		
+		if (empty ( $fetch_mode )) {
+		    $rs = $sth->fetchAll ( PDO::FETCH_ASSOC );
 		} else {
-			$rs = array ();
+		    $rs = $sth->fetch ( PDO::FETCH_ASSOC );
 		}
 		return $rs;
 	}
@@ -82,9 +84,11 @@ abstract class Db {
 	/*
 	 * Name : 执行
 	 */
-	public function exec($sql) {
+	public function exec($sql, $getArr) {
 		self::_clean ();
-		return self::$s_db_obj ->exec ( $sql );
+		$sth = self::$s_db_obj->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		return $sth->execute($getArr);
+		//return self::$s_db_obj ->exec ( $sql );
 	}
 	/*
 	 * Name : 插入帮助
@@ -95,11 +99,7 @@ abstract class Db {
 		if (is_array ( $insert_arr )) {
 			foreach ( $insert_arr as $key => $val ) {
 				$insert_arr_t [] = $key;
-				if (! get_magic_quotes_gpc ()) {
-					$value_arr_t [] = '\'' . addslashes ( $val ) . '\'';
-				} else {
-					$value_arr_t [] = '\'' . $val . '\'';
-				}
+				$value_arr_t [] = ':' . $key ;
 			}
 			return " (" . implode ( ',', $insert_arr_t ) . ") values (" . implode ( ',', $value_arr_t ) . ")";
 		}
@@ -112,49 +112,68 @@ abstract class Db {
 			return $cond_arr;
 		}
 		$cond_arr_t = array ();
-		foreach ( $cond_arr as $key => $val ) {
+		foreach ( $cond_arr as $key => $val ) {			
 			if (is_array ( $val )) {
-				$cond_arr_t [] = $key . " in (" . self::get_sql_cond_by_in ( $val ) . ")";
+				$cond_arr_t [] = $key . " in (" . self::get_sql_cond_by_in ( $key , $val) . ")";
 			} else {
-				if (! get_magic_quotes_gpc ()) {
-					$cond_arr_t [] = $key . "='" . addslashes ( $val ) . "'";
-				} else {
-					$cond_arr_t [] = $key . "='" . $val . "'";
-				}
+			    //var_dump($key, strpos($key, '>'));
+			    $keyStr = $key ;
+			    if(strpos($key, '<') !== false) $keyStr = str_replace(array(' ', '<'), array('', ''), $key) .'_1';
+			    if(strpos($key, '>') !== false) $keyStr = str_replace(array(' ', '>'), array('', ''), $key).'_2';
+			    if(strpos($key, 'LIKE') !== false) {
+			        $keyStr = str_replace(array(' ', 'LIKE'), array('', ''), $key).'_3';
+			        $cond_arr_t [] = $key . " :" . $keyStr.'' ;
+			    }else{
+			        $cond_arr_t [] = $key . "=:" . $keyStr ;
+			    }
+				
 			}
 		}
-		return empty ( $cond_arr_t ) ? '' : ' WHERE ' . implode ( ' && ', $cond_arr_t );
+		return empty ( $cond_arr_t ) ? '' : ' WHERE ' . implode ( ' AND ', $cond_arr_t );
 	}
 	/*
 	 * Name : IN辅助
 	 */
-	public function get_sql_cond_by_in($cond_arr) {
-		$cond_arr_t = array ();
-		foreach ( $cond_arr as $key => $val ) {
-			if (! get_magic_quotes_gpc ()) {
-				$cond_arr_t [] = '\'' . addslashes ( $val ) . '\'';
-			} else {
-				$cond_arr_t [] = '\'' . $val . '\'';
-			}
-		}
-		return implode ( ',', $cond_arr_t );
+	public function get_sql_cond_by_in($Key, $InArr) {
+	    $Arr = array();
+	    for($i=0;$i<count($InArr);$i++){
+	        $Arr[] = ':'.$Key.'_'.$i;
+	    }
+		return implode ( ',', $Arr );
 	}
 	/*
 	 * Name : 修改帮助
 	 */
 	public function get_sql_update($update_arr = array()) {
-		$update_arr_t = '';
+		$update_arr_t = array();
 		if (! is_array ( $update_arr )) {
 			return $update_arr;
 		}
 		foreach ( $update_arr as $key => $val ) {
-			if (! get_magic_quotes_gpc ()) {
-				$update_arr_t [] = $key . " = '" . addslashes ( $val ) . "'";
-			} else {
-				$update_arr_t [] = $key . " = '" . $val . "'";
-			}
+		    $update_arr_t [] = $key . " = :" . $key;
 		}
 		return implode ( ',', $update_arr_t );
+	}
+	
+	public function get_execute_arr($update_arr){
+	    $Arr = array();
+	    foreach($update_arr as $k => $v){
+	        if(is_array($v)){
+	            for($i=0;$i<count($v);$i++) $Arr[':'.$k.'_'.$i] = $v[$i];
+	        }else{
+	            $keyStr = $k;
+	            if(strpos($k, '<') !== false) $keyStr = str_replace(array(' ', '<'), array('', ''), $k).'_1';
+	            if(strpos($k, '>') !== false) $keyStr = str_replace(array(' ',  '>'), array('', ''), $k).'_2';
+	            if(strpos($k, 'LIKE') !== false){
+	                $keyStr = str_replace(array(' ',  'LIKE'), array('', ''), $k).'_3';
+	                $Arr[':'.$keyStr] = '%'.$v.'%';
+	            }else{
+	                $Arr[':'.$keyStr] = $v;
+	            }
+	            
+	        }	        
+	    }
+	    return $Arr;
 	}
 	/*
 	 * Name : 设置主键
@@ -175,7 +194,7 @@ abstract class Db {
 	 * Name : 排序帮助
 	 */
 	public static function sort($sort) {
-		$sort_arr = '';
+		$sort_arr = array();
 		if (empty ( $sort ))
 			return '';
 		if (is_array ( $sort )) {

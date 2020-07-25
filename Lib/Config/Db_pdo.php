@@ -80,9 +80,6 @@ class Db_pdo extends Db {
 	public function ExecInsert() {
 		return self::insert ( $this->sqlSetArr ['Insert'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['IsDebug'] );
 	}
-	public function ExecInsertBatch() {
-		return self::insertBatch( $this->sqlSetArr ['Insert'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['IsDebug'] );
-	}
 	public function ExecReplace() {
 		return self::replace ( $this->sqlSetArr ['Insert'], $this->sqlSetArr ['TbName'], $this->sqlSetArr ['IsDebug'] );
 	}
@@ -95,19 +92,26 @@ class Db_pdo extends Db {
 	public function selectOne($cond_arr = array(), $field = '*', $tb_name = '', $index = 0, $limit = '', $sort = '', $fetch = 0, $isDebug = 0) {
 		return self::select ( $cond_arr, $field, $tb_name, $index, $limit, $sort, 1, $isDebug );
 	}
+    public function GetListByPage($Limit, $CondArr, $Sort, &$count){
+	    return $this->SetTable()->SetCond($CondArr)->SetLimit($Limit)->SetSort($Sort)->ExecSelectAll($count);
+	}
 	public function select($cond_arr = array(), $field = '*', $tb_name = '', $index = 0, $limit = '', $sort = '', $fetch = 0, $isDebug = 0) {
-		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
+	    $tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$limit_str = ! is_array ( $limit ) ? $limit : ' limit ' . $limit [0] . ',' . $limit [1] . '';
 		$sort_str = $this->sort ( $sort );
 		$sql = "SELECT " . $field . " FROM " . $this->p_dbConfig ['Prefix'] . $tb_name . $this->get_sql_cond ( $cond_arr ) . $sort_str . $limit_str . "";
-		! $isDebug || var_dump ( $sql );
+		$getArr = $this->get_execute_arr($cond_arr);		
+		if($isDebug){
+		    var_dump ( $sql );
+		    var_dump($getArr);
+		}
 		if ($fetch == 1) {
-			return $this->query ( $sql, 1 );
+			return $this->query ( $sql, $getArr, 1 );
 		}
 		if (empty ( $index )) {
-			return $this->query ( $sql );
+			return $this->query ( $sql , $getArr);
 		} else {
-			return $this->set_index ( $this->query ( $sql ), $index );
+			return $this->set_index ( $this->query ( $sql , $getArr), $index );
 		}
 	}
 	public function selectAll($cond_arr = '', $field = '*', $tb_name = '', $index = 0, $limit = '', $sort = '', $isDebug = 0, &$count) {
@@ -119,8 +123,9 @@ class Db_pdo extends Db {
 		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$value_str = parent::get_sql_insert ( $insert_arr );
 		$sql = "INSERT INTO " . $this->p_dbConfig ['Prefix'] . $tb_name . $value_str . "";
+		$getArr = $this->get_execute_arr($insert_arr);
 		! $isDebug || var_dump ( $sql );
-		return $this->exec ( $sql );
+		return $this->exec ( $sql , $getArr);
 	}
 	public function insertBatch($insert_arr = array(), $tb_name = 0, $isDebug = 0){
 		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
@@ -129,7 +134,7 @@ class Db_pdo extends Db {
 		foreach($insert_arr as $k => $v){
 			$valStrArr[] = "('".implode("', '", array_values($v))."')" ;
 		}
-		$sql = "INSERT INTO " . $this->p_dbConfig ['Prefix'].$tb_name . ' ('.$keyStr .') VALUES '. implode(',', $valStrArr);
+		$sql = "INSERT INTO " . $tb_name . ' ('.$keyStr .') VALUES '. implode(',', $valStrArr);
 		! $isDebug || var_dump ( $sql );
 		return $this->exec ( $sql );
 	}
@@ -137,8 +142,9 @@ class Db_pdo extends Db {
 		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$value_str = parent::get_sql_insert ( $insert_arr );
 		$sql = "REPLACE INTO " . $this->p_dbConfig ['Prefix'] . $tb_name . $value_str . "";
+		$getArr = $this->get_execute_arr($insert_arr);
 		! $isDebug || var_dump ( $sql );
-		return $this->exec ( $sql );
+		return $this->exec ( $sql , $getArr);
 	}
 	public function update($update_arr = array(), $cond_arr = array(), $tb_name = 0, $isDebug = 0) {
 		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
@@ -146,13 +152,17 @@ class Db_pdo extends Db {
 		$cond_str = parent::get_sql_cond ( $cond_arr );
 		$sql = "UPDATE " . $this->p_dbConfig ['Prefix'] . $tb_name . " SET " . $update_str . $cond_str . "";
 		! $isDebug || var_dump ( $sql );
-		return $this->exec ( $sql );
+		$getUpdateArr = self::get_execute_arr($update_arr);
+		$getCondArr = self::get_execute_arr($cond_arr);
+		$getArr = array_merge($getUpdateArr, $getCondArr);
+		return $this->exec($sql, $getArr);
 	}
 	public function delete($cond_arr = array(), $tb_name = 0, $isDebug = 0) {
 	    $tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$sql = "DELETE FROM " . $this->p_dbConfig ['Prefix'] . $tb_name . parent::get_sql_cond ( $cond_arr ) . "";
 		! $isDebug || var_dump ( $sql );
-		return $this->exec ( $sql );
+		$getArr = $this->get_execute_arr($cond_arr);
+		return $this->exec ( $sql, $getArr );
 	}
 }
 ?>
