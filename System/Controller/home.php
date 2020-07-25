@@ -9,11 +9,11 @@ class Home extends Controllers {
 		phpinfo ();
 	}
 	
-	public function build_Action(){
+    public function build_Action(){
 	    $DbConfig = db_config ();
 	    $Pre = $DbConfig['Prefix'];
 	    $PdoObj = Db_pdo::get_instance();
-	    $TableArr = $PdoObj->query('show tables;');
+	    $TableArr = $PdoObj->query('show tables;', array());
 	    $OtherInterface = $OtherPublic = $OtherInclude = array();
 	    foreach($TableArr as $v){
 	        $TableName = substr($v['Tables_in_'.$DbConfig['Name']], strlen($Pre));
@@ -30,10 +30,10 @@ class Home extends Controllers {
 	    echo '<span style="color:#ff0000;">Success !</span>';
 	}
 	
-	private function _b($DbName, $Pre, $TableName){
+    private function _b($DbName, $Pre, $TableName){
 	    $PdoObj = Db_pdo::get_instance();
 	    $ClassName = strtoupper($Pre).ucfirst($TableName);
-	    $Arr = $PdoObj->query('SHOW FULL COLUMNS FROM '.$Pre.$TableName);
+	    $Arr = $PdoObj->query('SHOW FULL COLUMNS FROM '.$Pre.$TableName, array());
 	    $PrimaryKey = '';
 	    $Date = date('Y-m-d');
 	    foreach($Arr as $k => $v) if($v['Key'] == 'PRI') $PrimaryKey = $v['Field'];	        
