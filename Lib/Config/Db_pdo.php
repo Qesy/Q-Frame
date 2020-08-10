@@ -99,6 +99,11 @@ class Db_pdo extends Db {
 	    $tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$limit_str = ! is_array ( $limit ) ? $limit : ' limit ' . $limit [0] . ',' . $limit [1] . '';
 		$sort_str = $this->sort ( $sort );
+		if(is_array($cond_arr)){
+		    foreach($cond_arr as $v){
+		        if(is_array($v) && empty($v)) return array(); //空数组返回为空数组
+		    }
+		}
 		$sql = "SELECT " . $field . " FROM " . $this->p_dbConfig ['Prefix'] . $tb_name . $this->get_sql_cond ( $cond_arr ) . $sort_str . $limit_str . "";
 		$getArr = $this->get_execute_arr($cond_arr);		
 		if($isDebug){
