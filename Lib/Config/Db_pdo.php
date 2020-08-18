@@ -152,6 +152,11 @@ class Db_pdo extends Db {
 		return $this->exec ( $sql , $getArr);
 	}
 	public function update($update_arr = array(), $cond_arr = array(), $tb_name = 0, $isDebug = 0) {
+	    if(is_array($cond_arr)){
+	        foreach($cond_arr as $v){
+	            if(is_array($v) && empty($v)) return 0; //空数组返回为空数组
+	        }
+	    }
 		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$update_str = parent::get_sql_update ( $update_arr );
 		$cond_str = parent::get_sql_cond ( $cond_arr );
@@ -163,6 +168,11 @@ class Db_pdo extends Db {
 		return $this->exec($sql, $getArr);
 	}
 	public function delete($cond_arr = array(), $tb_name = 0, $isDebug = 0) {
+	    if(is_array($cond_arr)){
+	        foreach($cond_arr as $v){
+	            if(is_array($v) && empty($v)) return 0; //空数组返回为空数组
+	        }
+	    }
 	    $tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
 		$sql = "DELETE FROM " . $this->p_dbConfig ['Prefix'] . $tb_name . parent::get_sql_cond ( $cond_arr ) . "";
 		! $isDebug || var_dump ( $sql );

@@ -211,7 +211,7 @@ class Build {
 	
 	private function _FormRadio($Name, $Desc, $Value, $DataArr = array(),  $Col, $IsDisabled = 0){
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
-	    $Str = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'""><label  class="mr-3">'.$Desc.'</label>';
+	    $Str = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'"><label  class="mr-3">'.$Desc.'</label>';
 	    foreach($DataArr as $k => $v){
 	        $Checked = ($Value == $k) ? 'checked="checked"' : '';
 	        $Str .= '<label class="radio-inline mr-3"><input type="radio" name="'.$Name.'"  value="'.$k.'" '.$Checked.'> '.$v.'</label>';
@@ -223,7 +223,7 @@ class Build {
 	private function _FormCheckbox($Name, $Desc, $Value, $DataArr = array(),  $Col, $IsDisabled = 0){ //Checkbox
 	    //$ValueArr = explode('|', $Value);
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
-	    $Str = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'""><label  class="mr-3 font-weight-bold">'.$Desc.'</label>';
+	    $Str = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'"><label  class="mr-3 font-weight-bold">'.$Desc.'</label>';
 	    foreach($DataArr as $k => $v){
 	        $Checked = in_array($k, $Value) ? 'checked="checked"' : '';
 	        $Str .= '<div class="form-check form-check-inline mr-3"><label class="checkbox-inline "><input type="checkbox" name="'.$Name.'['.$k.']"  value="1" '.$Checked.' > '.$v.'</label></div>';
@@ -291,7 +291,7 @@ class Build {
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
-	    $StrHtml = '<div class="col='.$SubCol.' col-lg-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label>';
+	    $StrHtml = '<div class="col-'.$SubCol.' col-lg-'.$Col.'"><label for="Input_'.$Name.'">'.$Desc.'</label>';
 	    $StrJs = '';
 	    $ValueArr = explode('|', $Value);
 	    foreach($ValueArr as $sk => $sv){
@@ -380,17 +380,27 @@ class Build {
 	/*
 	 *  $keyArr = array('name' => ''标题'');
 	 */
-	public function Table(array $arr, $keyArr, $Page = ''){
+	public function Table(array $arr, $keyArr, $Page = '', $OpenBatch = false){
 	    $num = count($keyArr);
 	    if(empty($this->LinkAdd)) $this->LinkAdd = $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'add'));
 	    if(empty($this->LinkEdit)) $this->LinkEdit = $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'edit'));
 	    if(empty($this->LinkDel)) $this->LinkDel = $this->CommonObj->Url(array($this->Module, \Router::$s_Controller, 'del'));
 	    $str = '<table class="table"><thead><tr>';
+	    if($OpenBatch == true){
+	        $str .= '<th  scope="col" ><div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="SelectAll" value="total">
+            </div></th>';
+	    }
 	    foreach($keyArr as $k => $v) $str .= '<th  scope="col">'.$v['Name'].'</th>';
 	    if($this->IsEdit || $this->IsDel) $str .= '<th  scope="col">操作</th>';	    
 	    $str .= '</tr></thead><tbody>';
 	    foreach($arr as $k => $v){	        
 	        $str .= '<tr>';
+	        if($OpenBatch == true){
+	            $str .= '<td><div class="form-check form-check-inline">
+                  <input class="form-check-input SelectBatch" type="checkbox"  value="'.$v[$this->PrimaryKey].'">
+                </div></td>';
+                	        }
 	        foreach($keyArr as $sk => $sv){
 	            $Pre = isset($sv['Pre']) ? $sv['Pre'] : '';
 	            //var_dump($sv);
@@ -408,6 +418,12 @@ class Build {
                         break;
                     case 'Money':
                         $str .= '<td>&yen; '.$v[$sk].'</td>';
+                        break;
+                    case 'Switch':
+                        $str .= '<td><span class="switch switch-sm">
+                                    <input type="checkbox" class="StateBtn switch" id="switch-'.$sk.'-'.$v[$this->PrimaryKey].'" data="'.$v[$this->PrimaryKey].'" dataState="'.(($v[$sk] == 1) ? 2 : 1).'" dataField="'.$sk.'" '.(($v[$sk] == 1) ? 'checked' : '').'>
+                                    <label for="switch-'.$sk.'-'.$v[$this->PrimaryKey].'"></label>
+                                  </span></td>';break;
                         break;
 	                default:
 	                    $str .= '<td>'.$Pre.$v[$sk].'</td>';break;
