@@ -53,6 +53,7 @@ class Build {
 	    $this->Html = '<form method="'.$Method.'" class="BuildForm '.$Class.'">';
 	    foreach($this->Arr as $k => $v){
 	           if(empty($v['Col']) && $Class != 'form-inline') $v['Col'] = 12;
+	           $v['Required'] = empty($v['Required']) ? 0 : 1;
 	           switch ($v['Type']){
 	               case 'formgroup':
 	                   $this->Html .= self::_FromGroup($v['Col'], $v['Desc']); break;
@@ -63,7 +64,7 @@ class Build {
 	               case 'select':
 	                   $this->Html .= self::_FromSelect($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Disabled']); break;
 	               case 'upload':
-	                   list($StrHtml, $StrJs) = self::_FormUpload($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); 
+	                   list($StrHtml, $StrJs) = self::_FormUpload($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder'], $v['Required']); 
 	                   $this->Html .= $StrHtml;
 	                   $this->Js .= $StrJs;
 	                   break;
@@ -73,22 +74,22 @@ class Build {
 	                   $this->Js .= $StrJs;
 	                   break;
 	               case 'textarea':
-	                   $this->Html .= self::_FormTextarea($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); break;
+	                   $this->Html .= self::_FormTextarea($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder'], $v['Required']); break;
                    case 'editor':
                        list($StrHtml, $StrJs) = self::_FormEditor($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); 
                        $this->Html .= $StrHtml;
                        $this->Js .= $StrJs;
                        break;
 	               case 'money':
-	                       $this->Html .= self::_FromMoney($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder']); break;	                       
+	                       $this->Html .= self::_FromMoney($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Disabled'], $v['Placeholder'], $v['Required']); break;	                       
                    case 'date':
-                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'date', $v['Disabled'], $v['Placeholder']); break;
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'date', $v['Disabled'], $v['Placeholder'], $v['Required']); break;
                    case 'time':
-                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'time', $v['Disabled'], $v['Placeholder']); break;
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'time', $v['Disabled'], $v['Placeholder'], $v['Required']); break;
                    case 'datetime':
-                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'datetime-local', $v['Disabled'], $v['Placeholder']); break;
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'datetime-local', $v['Disabled'], $v['Placeholder'], $v['Required']); break;
                    case 'password':
-                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'password', $v['Disabled'], $v['Placeholder']); break;
+                       $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'password', $v['Disabled'], $v['Placeholder'], $v['Required']); break;
                    case 'button':
                        if(empty($v['ButtonType'])) $v['ButtonType'] = 'submit';
                        if(empty($v['Class'])) $v['Class'] = 'primary';
@@ -110,7 +111,7 @@ class Build {
                        if(empty($v['Class'])) $v['Class'] = 'primary';
                        $this->Html .= self::_Hidden($v['Name'], $v['Desc'], $v['Value'], $v['Col'], $v['Data'], $v['Class']);break;
 	               default:
-	                   $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'text', $v['Disabled'], $v['Placeholder']); break;
+	                   $this->Html .= self::_FromInput($v['Name'], $v['Desc'], $v['Value'], $v['Col'], 'text', $v['Disabled'], $v['Placeholder'], $v['Required']); break;
 	           }
 	       }
 	       if($Class != 'form-inline') $Col = 12;
@@ -245,15 +246,20 @@ class Build {
 	    return $Str;
 	}
 	
-	private function _FormUpload($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){
+	private function _FormUpload($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = '', $Required = 0){
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
+	    $RequiredViewStr = $RequiredStr = '';
+	    if(!empty($Required)){
+	        $RequiredStr = 'required="required"';
+	        $RequiredViewStr = '<span class="text-danger ml-2" style="font-weight: 900;">*</span>';
+	    }
 	    $StrHtml = $StrJs = '';
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
 	    $StrHtml .= '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
-                                    <label for="Input_'.$Name.'">'.$Desc.'</label>
+                                    <label for="Input_'.$Name.'">'.$Desc.'</label>'.$RequiredViewStr.'
                                     <div class="input-group">
-                                      <input type="text" class="form-control" '.$Disabled.' placeholder="'.$Placeholder.'" name="'.$Name.'" Id="Img_'.$Name.'" value="'.$Value.'">
+                                      <input type="text" class="form-control" '.$Disabled.' placeholder="'.$Placeholder.'" name="'.$Name.'" Id="Img_'.$Name.'" value="'.$Value.'" '.$RequiredStr.'>
                                       <span class="input-group-append">
                                         <button class="btn btn-success" id="uploadImg_'.$Name.'" type="button">上传</button>
                                       </span>
@@ -325,38 +331,53 @@ class Build {
         return array($StrHtml, $StrJs);
 	}
 	
-	private function _FormEditor($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //编辑器
+	private function _FormEditor($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = '', $Required = 0){ //编辑器
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Name  ;
+	    $RequiredViewStr = $RequiredStr = '';
+	    if(!empty($Required)){
+	        $RequiredStr = 'required="required"';
+	        $RequiredViewStr = '<span class="text-danger ml-2" style="font-weight: 900;">*</span>';
+	    }
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
 	    $StrHtml = '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
-                        <label for="Input_'.$Name.'">'.$Desc.'</label>
-                        <textarea class="form-control Input_Editor" name="'.$Name.'" '.$IsDisabled.' rows="16" id="Input_'.$Name.'" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>'.$RequiredViewStr.'
+                        <textarea class="form-control Input_Editor" name="'.$Name.'" '.$IsDisabled.' rows="16" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" '.$RequiredStr.'>'.$Value.'</textarea>
                     </div>';
         return array($StrHtml);
 	}
 	
-	private function _FromMoney($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //金钱
+	private function _FromMoney($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = '', $Required = 0){ //金钱
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
+	    $RequiredViewStr = $RequiredStr = '';
+	    if(!empty($Required)){
+	        $RequiredStr = 'required="required"';
+	        $RequiredViewStr = '<span class="text-danger ml-2" style="font-weight: 900;">*</span>';
+	    }
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
 	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
-                        <label for="Input_'.$Name.'">'.$Desc.'</label>
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>'.$RequiredViewStr.'
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend"><span class="input-group-text">&yen;</span></div>
-                                <input type="text" class="form-control" name="'.$Name.'" '.$IsDisabled.' id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'">
+                                <input type="text" class="form-control" name="'.$Name.'" '.$IsDisabled.' id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'" '.$RequiredStr.'>
                                 <div class="input-group-append"><span class="input-group-text">.00</span></div>
                             </div>
                     </div>';
 	}
 	
-	private function _FromInput($Name, $Desc, $Value, $Col, $Type = 'text', $IsDisabled = 0, $Placeholder = ''){ //输入框
+	private function _FromInput($Name, $Desc, $Value, $Col, $Type = 'text', $IsDisabled = 0, $Placeholder = '', $Required = 0){ //输入框
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
+	    $RequiredViewStr = $RequiredStr = '';
+	    if(!empty($Required)){
+	        $RequiredStr = 'required="required"';
+	        $RequiredViewStr = '<span class="text-danger ml-2" style="font-weight: 900;">*</span>';
+	    }
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
 	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
-                        <label for="Input_'.$Name.'">'.$Desc.'</label>
-                        <input type="'.$Type.'" '.$Disabled.' class="form-control" name="'.$Name.'" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'">
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>'.$RequiredViewStr.'
+                        <input type="'.$Type.'" '.$Disabled.' class="form-control" name="'.$Name.'" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" value="'.$Value.'" '.$RequiredStr.'>
                     </div>';
 	}
 	
@@ -366,13 +387,18 @@ class Build {
                     </div>';
 	}
 	
-	private function _FormTextarea($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = ''){ //输入框
+	private function _FormTextarea($Name, $Desc, $Value, $Col, $IsDisabled = 0, $Placeholder = '', $Required = 0){ //输入框
 	    $Disabled = ($IsDisabled) ? 'disabled="disabled"' : '';
 	    if(empty($Placeholder)) $Placeholder =  '请输入'.$Desc  ;
+	    $RequiredViewStr = $RequiredStr = '';
+	    if(!empty($Required)){
+	        $RequiredStr = 'required="required"';
+	        $RequiredViewStr = '<span class="text-danger ml-2" style="font-weight: 900;">*</span>';
+	    }
 	    $SubCol = ($Col*2 > 12) ? 12 : ($Col*2);
 	    return '<div class="form-group col-'.$SubCol.' col-lg-'.$Col.'">
-                        <label for="Input_'.$Name.'">'.$Desc.'</label>
-                        <textarea class="form-control" name="'.$Name.'" '.$Disabled.' rows="3" id="Input_'.$Name.'" placeholder="'.$Placeholder.'">'.$Value.'</textarea>
+                        <label for="Input_'.$Name.'">'.$Desc.'</label>'.$RequiredViewStr.'
+                        <textarea class="form-control" name="'.$Name.'" '.$Disabled.' rows="3" id="Input_'.$Name.'" placeholder="'.$Placeholder.'" '.$RequiredStr.'>'.$Value.'</textarea>
                       </div>';
 	}
 
