@@ -115,11 +115,13 @@ class Common {
 	    foreach ( $this->TempArr as $Key => $Val ) $$Key = $Val;
 	    require PATH_SYS . 'View/' . $Temp . EXTEND;
 	} */
-	public function LoadCss(array $CssArr) { // -- Name : 加载CSS --
-	    foreach ( $CssArr as $Val ) echo "<link href=\"" . URL_CSS . $Val . ".css?v=". VERSION ."\" rel=\"stylesheet\" type=\"text/css\" />\n";
+    public function LoadCss(array $CssArr, $IsBoot = false) { // -- Name : 加载CSS --
+	    $Path = $IsBoot ? URL_BOOT.'css/' : URL_CSS;
+	    foreach ( $CssArr as $Val ) echo "<link href=\"" . $Path . $Val . ".css?v=". VERSION ."\" rel=\"stylesheet\" type=\"text/css\" />\n";
 	}
-	public function loadScripts(array $jsArr) { // -- Name : 加载JS --
-	    foreach ( $jsArr as $key => $val ) echo "<script type=\"text/javascript\" src=\"" . URL_JS . $val .".js?v=" . VERSION . "\" charset=\"utf-8\"></script>";
+	public function loadScripts(array $jsArr, $IsBoot = false) { // -- Name : 加载JS --
+	    $Path = $IsBoot ? URL_BOOT.'js/' : URL_JS;
+	    foreach ( $jsArr as $key => $val ) echo "<script type=\"text/javascript\" src=\"" . $Path . $val .".js?v=" . VERSION . "\" charset=\"utf-8\"></script>";
 	}
 	
 	public function ExecScript($Str) { // -- 运行JS --

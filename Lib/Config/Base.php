@@ -41,7 +41,7 @@ abstract class Base {
 	
 	public function LoadView($Temp, $Data = array()) { // -- Name : 加载模版 --
 	    if (! is_file ( PATH_SYS . 'View/' . $Temp . EXTEND )) die ( PATH_SYS . 'View/' . $Temp . EXTEND . ' not found !' );
-	    $this->TempArr = empty ( $Data ) ? $this->TempArr : $Data;
+	    $this->TempArr = empty ( $Data ) ? $this->TempArr : array_merge($this->TempArr, $Data);
 	    foreach ( $this->TempArr as $Key => $Val ) $$Key = $Val;
 	    require PATH_SYS . 'View/' . $Temp . EXTEND;
 	}
