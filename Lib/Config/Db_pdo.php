@@ -24,7 +24,7 @@ class Db_pdo extends Db {
 		return self::$_instance [$classFullName];
 	}
 	
-	public function SetCond($Cond) {
+	public function SetCond($Cond = array()) {
 		$this->sqlSetArr ['Cond'] = $Cond;
 		return $this;
 	}
@@ -101,7 +101,10 @@ class Db_pdo extends Db {
 		$sort_str = $this->sort ( $sort );
 		if(is_array($cond_arr)){
 		    foreach($cond_arr as $v){
-		        if(is_array($v) && empty($v)) return array(); //空数组返回为空数组
+		        if(is_array($v) && empty($v)) {
+		            self::p_clean();
+		            return array(); //空数组返回为空数组
+		        }
 		    }
 		}
 		$sql = "SELECT " . $field . " FROM " . $this->p_dbConfig ['Prefix'] . $tb_name . $this->get_sql_cond ( $cond_arr ) . $sort_str . $limit_str . "";
@@ -154,7 +157,10 @@ class Db_pdo extends Db {
 	public function update($update_arr = array(), $cond_arr = array(), $tb_name = 0, $isDebug = 0) {
 	    if(is_array($cond_arr)){
 	        foreach($cond_arr as $v){
-	            if(is_array($v) && empty($v)) return 0; //空数组返回为空数组
+	            if(is_array($v) && empty($v)) {
+	                self::p_clean();
+	                return 0; //空数组返回为空数组
+	            }
 	        }
 	    }
 		$tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;
@@ -170,7 +176,10 @@ class Db_pdo extends Db {
 	public function delete($cond_arr = array(), $tb_name = 0, $isDebug = 0) {
 	    if(is_array($cond_arr)){
 	        foreach($cond_arr as $v){
-	            if(is_array($v) && empty($v)) return 0; //空数组返回为空数组
+	            if(is_array($v) && empty($v)) {
+	                self::p_clean();
+	                return 0; //空数组返回为空数组
+	            }
 	        }
 	    }
 	    $tb_name = empty ( $tb_name ) ? $this->TableName : $tb_name;

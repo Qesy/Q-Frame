@@ -65,7 +65,7 @@ abstract class Db {
 	 * Name : 查询
 	 */
 	public function query($sql, $getArr, $fetch_mode = 0) {
-		self::_clean ();
+		self::p_clean ();
 		$sth = self::$s_db_obj->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$sth->execute($getArr);		
 		if (empty ( $fetch_mode )) {
@@ -85,7 +85,7 @@ abstract class Db {
 	 * Name : 执行
 	 */
 	public function exec($sql, $getArr) {
-		self::_clean ();
+		self::p_clean ();
 		$sth = self::$s_db_obj->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		return $sth->execute($getArr);
 		//return self::$s_db_obj ->exec ( $sql );
@@ -206,7 +206,7 @@ abstract class Db {
 			return $sort;
 		}
 	}
-	private function _clean() {
+	protected  function p_clean() {
 		$this->sqlSetArr = array (
 				'Cond' => array (),
 				'Insert' => array (),
