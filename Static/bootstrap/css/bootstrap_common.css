@@ -10,10 +10,11 @@ a:hover{
 }
 
 /*去圆角*/
-.form-control, .form-control:focus{border:1px solid #ced4da;border-radius:unset;box-shadow: none;}
-.input-group-text{border:1px solid #ced4da;border-radius:unset;}
-.btn{border:1px solid #ced4da;border-radius:unset;}
+.form-control, .form-control:focus{border-radius:unset;box-shadow: none;}
+.input-group-text, .nav-pills .nav-link{border-radius:unset;}
+.btn{border-radius:unset;}
 
+.card{border-radius:unset;}
 input{
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
@@ -22,4 +23,11 @@ input{
 /*modal设置*/
 .modal-footer{
   justify-content:center;
+}
+
+.ck-content {
+   min-height: 300px;
+}
+.ck.ck-icon {
+    font-size: .6em !important;
 }
