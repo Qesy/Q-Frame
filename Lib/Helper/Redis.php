@@ -19,7 +19,7 @@ class Redis {
 	private static function __getRedis() {
 		if (! isset ( self::$_redis )) {
 			try {
-				self::$_redis = new Redis ();
+				self::$_redis = new \Redis();
 				self::$_redis->connect ( '127.0.0.1', 6379 );
 				self::$_redis->auth ( "Yu7#iH8*2gtE5ew3bp6" );
 				$configArr = db_config ();

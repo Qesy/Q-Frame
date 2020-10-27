@@ -27,8 +27,15 @@ class Router {
 	}
 	private function _FetchUrl($Url) {
 		$RouterArr = array ();	
-		if (php_sapi_name () == 'cli') {
-			$Url = implode ( '/', array_slice ( $_SERVER ['argv'], 1 ) );
+	   if (php_sapi_name () == 'cli') {
+			$Url = $_SERVER ['argv'][1]; //路径解析 例 首页 index/index
+			$ParaArr = array_slice ($_SERVER ['argv'] , 2 );
+			if(!empty($ParaArr)){
+			    foreach($ParaArr as $v){
+			        $Sub = explode('=', $v);
+			        $_GET[$Sub[0]] = $Sub[1];
+			    }
+			}
 		}
 		if (strpos ( $Url, 'poweredByQesy' ) !== false) {
 			echo "powered By Qesy <br>\n";
