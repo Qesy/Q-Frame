@@ -15,6 +15,8 @@ define ( 'PATH_DIRNAME', pathinfo ( __FILE__, PATHINFO_DIRNAME ) );
 define ( 'PATH_SYS', PATH_DIRNAME . '/System/' );
 define ( 'PATH_LIB', PATH_DIRNAME . '/Lib/' );
 define ( 'PATH_STATIC', PATH_DIRNAME . '/Static/' );
+define ( 'EXTEND', '.php' );
+require PATH_LIB . 'Config/Config' . EXTEND;
 define ( 'URL_ROOT', substr($_SERVER['PHP_SELF'], 0, -9) );
 define ( 'URL_CURRENT', substr(explode('?', $_SERVER ['REQUEST_URI'])[0], count(URL_ROOT))) ; 
 define ( 'URL_IMG', URL_ROOT . 'Static/images/' );
@@ -22,6 +24,5 @@ define ( 'URL_JS', URL_ROOT . 'Static/scripts/' );
 define ( 'URL_CSS', URL_ROOT . 'Static/styles/' );
 define ( 'URL_BOOT', URL_ROOT.'Static/bootstrap/');
 define( 'URL_DOMAIN', $_SERVER['HTTP_HOST']);
-define ( 'EXTEND', '.php' );
 require PATH_LIB . 'X' . EXTEND;  
 ?>
