@@ -33,7 +33,7 @@ function SiteConfig() {
 	);
 }
 
-function __autoload($classname) { // -- 自动加载类 --
+function autoload($classname) { // -- 自动加载类 --
     $filename = PATH_LIB . $classname . '.php';
     $filename = str_replace('\\', '/', $filename);
     if (file_exists ( $filename ))
